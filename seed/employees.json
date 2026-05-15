@@ -1,0 +1,471 @@
+[
+  {
+    "name": "Aarav Sharma",
+    "email": "aarav.sharma@demo.com",
+    "city": "Bangalore",
+    "seniority": "junior",
+    "yearsExperience": 2,
+    "skills": [
+      { "name": "React", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "TypeScript", "category": "language", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "Tailwind CSS", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "Razorpay SDK", "category": "tool", "proficiency": "intermediate", "yearsExperience": 1 },
+      { "name": "Jest", "category": "tool", "proficiency": "beginner", "yearsExperience": 1 }
+    ],
+    "projects": [
+      {
+        "name": "Checkout redesign",
+        "description": "Rebuilt a multi-step checkout flow used by 30k monthly users, integrating Razorpay for UPI and cards. Reduced drop-off at the payment step by 18%.",
+        "skillsUsed": ["React", "TypeScript", "Razorpay SDK"],
+        "duration": "5 months"
+      },
+      {
+        "name": "Merchant onboarding wizard",
+        "description": "Multi-page onboarding form with KYC document upload and progress persistence.",
+        "skillsUsed": ["React", "TypeScript", "Tailwind CSS"],
+        "duration": "3 months"
+      }
+    ],
+    "education": [{ "degree": "B.E. Computer Science", "institution": "PES University", "year": 2023 }]
+  },
+
+  {
+    "name": "Priya Iyer",
+    "email": "priya.iyer@demo.com",
+    "city": "Bangalore",
+    "seniority": "mid",
+    "yearsExperience": 5,
+    "skills": [
+      { "name": "Go", "category": "language", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "PostgreSQL", "category": "database", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "Redis", "category": "database", "proficiency": "intermediate", "yearsExperience": 3 },
+      { "name": "gRPC", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "AWS", "category": "cloud", "proficiency": "intermediate", "yearsExperience": 3 },
+      { "name": "Payment systems", "category": "domain", "proficiency": "advanced", "yearsExperience": 4 }
+    ],
+    "projects": [
+      {
+        "name": "Payouts ledger service",
+        "description": "Designed and built a double-entry ledger that powers UPI and IMPS payouts for a neobank. Handles ~80 TPS sustained, idempotent retries, daily reconciliation against partner banks.",
+        "skillsUsed": ["Go", "PostgreSQL", "Redis"],
+        "duration": "1 year"
+      },
+      {
+        "name": "Reconciliation engine",
+        "description": "Streaming reconciliation comparing bank statements against internal ledger; flags breaks with structured reasons for ops review.",
+        "skillsUsed": ["Go", "PostgreSQL"],
+        "duration": "6 months"
+      }
+    ],
+    "education": [{ "degree": "B.Tech Information Technology", "institution": "Anna University", "year": 2020 }]
+  },
+
+  {
+    "name": "Rohan Mehta",
+    "email": "rohan.mehta@demo.com",
+    "city": "Pune",
+    "seniority": "senior",
+    "yearsExperience": 8,
+    "skills": [
+      { "name": "Node.js", "category": "framework", "proficiency": "expert", "yearsExperience": 7 },
+      { "name": "React", "category": "framework", "proficiency": "advanced", "yearsExperience": 6 },
+      { "name": "TypeScript", "category": "language", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "PostgreSQL", "category": "database", "proficiency": "advanced", "yearsExperience": 6 },
+      { "name": "AWS", "category": "cloud", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "Kubernetes", "category": "cloud", "proficiency": "intermediate", "yearsExperience": 3 }
+    ],
+    "projects": [
+      {
+        "name": "Marketplace order pipeline",
+        "description": "Re-architected order processing for a fashion marketplace from a monolith into 4 services. Cut p95 order-confirm latency from 2.4s to 380ms.",
+        "skillsUsed": ["Node.js", "TypeScript", "PostgreSQL", "AWS"],
+        "duration": "1.5 years"
+      },
+      {
+        "name": "Seller dashboard 2.0",
+        "description": "End-to-end rebuild of the seller analytics dashboard. Real-time order feed, inventory alerts.",
+        "skillsUsed": ["React", "TypeScript", "Node.js"],
+        "duration": "8 months"
+      }
+    ],
+    "education": [{ "degree": "B.E. Computer Engineering", "institution": "COEP Pune", "year": 2017 }]
+  },
+
+  {
+    "name": "Ananya Reddy",
+    "email": "ananya.reddy@demo.com",
+    "city": "Hyderabad",
+    "seniority": "lead",
+    "yearsExperience": 12,
+    "skills": [
+      { "name": "Python", "category": "language", "proficiency": "expert", "yearsExperience": 11 },
+      { "name": "Apache Kafka", "category": "framework", "proficiency": "expert", "yearsExperience": 7 },
+      { "name": "Distributed systems", "category": "domain", "proficiency": "expert", "yearsExperience": 9 },
+      { "name": "Cassandra", "category": "database", "proficiency": "advanced", "yearsExperience": 6 },
+      { "name": "Kubernetes", "category": "cloud", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "Team leadership", "category": "soft", "proficiency": "advanced", "yearsExperience": 4 }
+    ],
+    "projects": [
+      {
+        "name": "Event platform",
+        "description": "Built and now leads a platform team running Kafka clusters at 500k events/sec across three regions. Authored the team's exactly-once delivery playbook.",
+        "skillsUsed": ["Apache Kafka", "Python", "Kubernetes"],
+        "duration": "3 years"
+      },
+      {
+        "name": "Observability rewrite",
+        "description": "Migrated 80+ services from ELK to a Clickhouse-backed pipeline; cut log query p95 from 14s to 900ms.",
+        "skillsUsed": ["Python", "Distributed systems"],
+        "duration": "1 year"
+      }
+    ],
+    "education": [
+      { "degree": "M.S. Computer Science", "institution": "IIIT Hyderabad", "year": 2014 },
+      { "degree": "B.Tech Computer Science", "institution": "NIT Warangal", "year": 2012 }
+    ]
+  },
+
+  {
+    "name": "Vikram Kumar",
+    "email": "vikram.kumar@demo.com",
+    "city": "Mumbai",
+    "seniority": "mid",
+    "yearsExperience": 4,
+    "skills": [
+      { "name": "Vue.js", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "TypeScript", "category": "language", "proficiency": "intermediate", "yearsExperience": 3 },
+      { "name": "Accessibility (WCAG)", "category": "domain", "proficiency": "advanced", "yearsExperience": 3 },
+      { "name": "Sass", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "Cypress", "category": "tool", "proficiency": "intermediate", "yearsExperience": 2 }
+    ],
+    "projects": [
+      {
+        "name": "Patient portal accessibility audit",
+        "description": "Led the WCAG 2.1 AA remediation of a hospital patient portal. Fixed 200+ violations across 40 screens; portal now passes audits from two enterprise clients.",
+        "skillsUsed": ["Vue.js", "Accessibility (WCAG)", "Sass"],
+        "duration": "9 months"
+      },
+      {
+        "name": "Appointments booking",
+        "description": "Rebuilt the appointment flow with keyboard navigation, screen-reader support, and reduced-motion handling.",
+        "skillsUsed": ["Vue.js", "TypeScript", "Accessibility (WCAG)"],
+        "duration": "4 months"
+      }
+    ],
+    "education": [{ "degree": "B.E. Information Technology", "institution": "VJTI Mumbai", "year": 2021 }]
+  },
+
+  {
+    "name": "Saanvi Pillai",
+    "email": "saanvi.pillai@demo.com",
+    "city": "Remote",
+    "seniority": "senior",
+    "yearsExperience": 9,
+    "skills": [
+      { "name": "Java", "category": "language", "proficiency": "expert", "yearsExperience": 9 },
+      { "name": "Spring Boot", "category": "framework", "proficiency": "expert", "yearsExperience": 7 },
+      { "name": "PostgreSQL", "category": "database", "proficiency": "advanced", "yearsExperience": 7 },
+      { "name": "KYC / AML", "category": "domain", "proficiency": "advanced", "yearsExperience": 6 },
+      { "name": "AWS", "category": "cloud", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "Payment systems", "category": "domain", "proficiency": "advanced", "yearsExperience": 6 }
+    ],
+    "projects": [
+      {
+        "name": "KYC orchestration platform",
+        "description": "Owns the KYC workflow service that gates onboarding for 4M users on a digital lending product. Integrates with NSDL, Karza, and Onfido; supports overrides via a reviewer dashboard.",
+        "skillsUsed": ["Java", "Spring Boot", "PostgreSQL", "KYC / AML"],
+        "duration": "2 years"
+      },
+      {
+        "name": "Transaction monitoring rules engine",
+        "description": "Built the AML rules engine evaluating 1.2M transactions/day with sub-200ms latency for blocked-transaction decisions.",
+        "skillsUsed": ["Java", "Spring Boot", "KYC / AML"],
+        "duration": "1 year"
+      }
+    ],
+    "education": [{ "degree": "B.Tech Electronics & Communication", "institution": "BITS Pilani Goa", "year": 2016 }]
+  },
+
+  {
+    "name": "Arjun Singh",
+    "email": "arjun.singh@demo.com",
+    "city": "Bangalore",
+    "seniority": "junior",
+    "yearsExperience": 1,
+    "skills": [
+      { "name": "Python", "category": "language", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "FastAPI", "category": "framework", "proficiency": "intermediate", "yearsExperience": 1 },
+      { "name": "Click", "category": "framework", "proficiency": "intermediate", "yearsExperience": 1 },
+      { "name": "PostgreSQL", "category": "database", "proficiency": "beginner", "yearsExperience": 1 },
+      { "name": "Docker", "category": "tool", "proficiency": "beginner", "yearsExperience": 1 }
+    ],
+    "projects": [
+      {
+        "name": "Internal CLI for deploys",
+        "description": "Built a Python CLI used by 30+ engineers to manage local k8s envs and trigger deploys. Replaced a brittle bash script that nobody understood.",
+        "skillsUsed": ["Python", "Click", "Docker"],
+        "duration": "4 months"
+      },
+      {
+        "name": "Feature flag service",
+        "description": "A small FastAPI service backing feature toggles with a SQLite cache for low-latency reads.",
+        "skillsUsed": ["Python", "FastAPI", "PostgreSQL"],
+        "duration": "3 months"
+      }
+    ],
+    "education": [{ "degree": "B.Tech Computer Science", "institution": "IIIT Bangalore", "year": 2024 }]
+  },
+
+  {
+    "name": "Meera Krishnan",
+    "email": "meera.krishnan@demo.com",
+    "city": "Pune",
+    "seniority": "mid",
+    "yearsExperience": 5,
+    "skills": [
+      { "name": "React Native", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "TypeScript", "category": "language", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "Node.js", "category": "framework", "proficiency": "intermediate", "yearsExperience": 3 },
+      { "name": "HIPAA / FHIR", "category": "domain", "proficiency": "advanced", "yearsExperience": 3 },
+      { "name": "GraphQL", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 }
+    ],
+    "projects": [
+      {
+        "name": "Clinician mobile app",
+        "description": "Cross-platform mobile app for rounding clinicians: chart review, order entry, secure messaging. FHIR-backed integration with the hospital EHR.",
+        "skillsUsed": ["React Native", "TypeScript", "HIPAA / FHIR", "GraphQL"],
+        "duration": "1.5 years"
+      },
+      {
+        "name": "Audit logging service",
+        "description": "Tamper-evident audit logs for PHI access events. Designed to pass a HIPAA audit on first pass — and it did.",
+        "skillsUsed": ["Node.js", "HIPAA / FHIR"],
+        "duration": "5 months"
+      }
+    ],
+    "education": [{ "degree": "B.E. Computer Science", "institution": "MIT WPU Pune", "year": 2020 }]
+  },
+
+  {
+    "name": "Karan Joshi",
+    "email": "karan.joshi@demo.com",
+    "city": "Mumbai",
+    "seniority": "lead",
+    "yearsExperience": 13,
+    "skills": [
+      { "name": "TypeScript", "category": "language", "proficiency": "expert", "yearsExperience": 9 },
+      { "name": "Node.js", "category": "framework", "proficiency": "expert", "yearsExperience": 11 },
+      { "name": "GraphQL", "category": "framework", "proficiency": "expert", "yearsExperience": 6 },
+      { "name": "Microservices", "category": "domain", "proficiency": "expert", "yearsExperience": 8 },
+      { "name": "Team leadership", "category": "soft", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "System design", "category": "domain", "proficiency": "expert", "yearsExperience": 8 },
+      { "name": "Payment systems", "category": "domain", "proficiency": "advanced", "yearsExperience": 7 }
+    ],
+    "projects": [
+      {
+        "name": "Platform re-architecture",
+        "description": "Led a 14-engineer effort splitting a TypeScript monolith into 22 services behind a federated GraphQL gateway. Sat on architecture review board.",
+        "skillsUsed": ["TypeScript", "Node.js", "GraphQL", "Microservices", "Team leadership"],
+        "duration": "2 years"
+      },
+      {
+        "name": "Payments rewrite",
+        "description": "Redesigned the payments domain to support split settlements for marketplace sellers. RBI-compliant flows, audited by a Big Four firm.",
+        "skillsUsed": ["TypeScript", "Microservices", "Payment systems"],
+        "duration": "10 months"
+      },
+      {
+        "name": "Hiring & mentoring",
+        "description": "Built the senior-engineer interview loop and mentored 6 mid-level engineers to senior.",
+        "skillsUsed": ["Team leadership", "System design"],
+        "duration": "Ongoing"
+      }
+    ],
+    "education": [{ "degree": "B.Tech Computer Science", "institution": "IIT Bombay", "year": 2012 }]
+  },
+
+  {
+    "name": "Tara Banerjee",
+    "email": "tara.banerjee@demo.com",
+    "city": "Bangalore",
+    "seniority": "mid",
+    "yearsExperience": 5,
+    "skills": [
+      { "name": "Next.js", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "React", "category": "framework", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "TypeScript", "category": "language", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "Design systems", "category": "domain", "proficiency": "advanced", "yearsExperience": 3 },
+      { "name": "Figma", "category": "tool", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "Storybook", "category": "tool", "proficiency": "advanced", "yearsExperience": 3 }
+    ],
+    "projects": [
+      {
+        "name": "Pulse design system",
+        "description": "Built and maintains a 60-component design system consumed by 4 product apps in a fashion marketplace. Tokens-first, dark mode, full Storybook coverage.",
+        "skillsUsed": ["Next.js", "React", "Design systems", "Storybook"],
+        "duration": "1.5 years"
+      },
+      {
+        "name": "Storefront redesign",
+        "description": "Marketing site migration from Webflow to Next.js with a 40-page CMS-driven content model.",
+        "skillsUsed": ["Next.js", "TypeScript", "Figma"],
+        "duration": "6 months"
+      }
+    ],
+    "education": [{ "degree": "B.Des Visual Communication", "institution": "NID Ahmedabad", "year": 2020 }]
+  },
+
+  {
+    "name": "Devansh Patel",
+    "email": "devansh.patel@demo.com",
+    "city": "Hyderabad",
+    "seniority": "senior",
+    "yearsExperience": 7,
+    "skills": [
+      { "name": "Python", "category": "language", "proficiency": "expert", "yearsExperience": 7 },
+      { "name": "FastAPI", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "PyTorch", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "NLP", "category": "domain", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "HIPAA / FHIR", "category": "domain", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "AWS", "category": "cloud", "proficiency": "advanced", "yearsExperience": 5 }
+    ],
+    "projects": [
+      {
+        "name": "Clinical notes summarization",
+        "description": "Fine-tuned an LLM to summarize free-text clinical notes into structured problem lists. Beat the baseline by 14 ROUGE-L points on internal eval. Deployed behind FastAPI with strict PHI redaction.",
+        "skillsUsed": ["Python", "PyTorch", "NLP", "HIPAA / FHIR"],
+        "duration": "1 year"
+      },
+      {
+        "name": "Diagnosis-code suggester",
+        "description": "Multi-label classifier suggesting ICD-10 codes from discharge summaries. Used by 80 clinicians as a coding aid.",
+        "skillsUsed": ["Python", "PyTorch", "NLP", "FastAPI"],
+        "duration": "8 months"
+      }
+    ],
+    "education": [{ "degree": "M.S. Computer Science", "institution": "IIT Hyderabad", "year": 2018 }]
+  },
+
+  {
+    "name": "Ishita Choudhary",
+    "email": "ishita.choudhary@demo.com",
+    "city": "Remote",
+    "seniority": "junior",
+    "yearsExperience": 2,
+    "skills": [
+      { "name": "React", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "TypeScript", "category": "language", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "Storybook", "category": "tool", "proficiency": "advanced", "yearsExperience": 2 },
+      { "name": "Design tokens", "category": "domain", "proficiency": "intermediate", "yearsExperience": 1 },
+      { "name": "CSS / Tailwind", "category": "framework", "proficiency": "advanced", "yearsExperience": 2 }
+    ],
+    "projects": [
+      {
+        "name": "Component library docs site",
+        "description": "Built and maintains the docs portal for an open-source UI library (1.4k GitHub stars). Live playground, dark-mode-aware token previews.",
+        "skillsUsed": ["React", "Storybook", "Design tokens", "CSS / Tailwind"],
+        "duration": "10 months"
+      },
+      {
+        "name": "Iconography pipeline",
+        "description": "Scripted an SVGO + React component generation pipeline for a 220-icon set.",
+        "skillsUsed": ["TypeScript", "Storybook"],
+        "duration": "2 months"
+      }
+    ],
+    "education": [{ "degree": "B.Tech Information Science", "institution": "RVCE Bangalore", "year": 2023 }]
+  },
+
+  {
+    "name": "Aditya Nair",
+    "email": "aditya.nair@demo.com",
+    "city": "Pune",
+    "seniority": "senior",
+    "yearsExperience": 9,
+    "skills": [
+      { "name": "Java", "category": "language", "proficiency": "expert", "yearsExperience": 9 },
+      { "name": "Apache Kafka", "category": "framework", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "Elasticsearch", "category": "database", "proficiency": "expert", "yearsExperience": 6 },
+      { "name": "Search relevance", "category": "domain", "proficiency": "advanced", "yearsExperience": 5 },
+      { "name": "Spring Boot", "category": "framework", "proficiency": "advanced", "yearsExperience": 7 },
+      { "name": "AWS", "category": "cloud", "proficiency": "advanced", "yearsExperience": 5 }
+    ],
+    "projects": [
+      {
+        "name": "Product search relevance",
+        "description": "Owns the search relevance pipeline for a marketplace with 12M SKUs. Ran A/B tests that lifted click-through on ambiguous queries by 9%.",
+        "skillsUsed": ["Elasticsearch", "Search relevance", "Java"],
+        "duration": "2 years"
+      },
+      {
+        "name": "Catalog ingestion",
+        "description": "Streaming Kafka pipeline ingesting seller catalog updates, deduping against a normalized canonical product graph.",
+        "skillsUsed": ["Java", "Apache Kafka", "Spring Boot"],
+        "duration": "1 year"
+      }
+    ],
+    "education": [{ "degree": "B.Tech Computer Engineering", "institution": "VIT Vellore", "year": 2016 }]
+  },
+
+  {
+    "name": "Riya Gupta",
+    "email": "riya.gupta@demo.com",
+    "city": "Bangalore",
+    "seniority": "mid",
+    "yearsExperience": 4,
+    "skills": [
+      { "name": "Next.js", "category": "framework", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "TypeScript", "category": "language", "proficiency": "advanced", "yearsExperience": 4 },
+      { "name": "tRPC", "category": "framework", "proficiency": "advanced", "yearsExperience": 2 },
+      { "name": "Prisma", "category": "framework", "proficiency": "advanced", "yearsExperience": 3 },
+      { "name": "PostgreSQL", "category": "database", "proficiency": "intermediate", "yearsExperience": 3 },
+      { "name": "Payment systems", "category": "domain", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "Open banking APIs", "category": "domain", "proficiency": "intermediate", "yearsExperience": 2 }
+    ],
+    "projects": [
+      {
+        "name": "Account aggregator client",
+        "description": "Built a Next.js + tRPC consent flow against India's Account Aggregator framework. Pulls bank statements with user consent for an SME lender.",
+        "skillsUsed": ["Next.js", "TypeScript", "tRPC", "Open banking APIs"],
+        "duration": "8 months"
+      },
+      {
+        "name": "Lending application portal",
+        "description": "Full-stack borrower portal: KYC, document upload, status tracking. Prisma + PostgreSQL on the backend.",
+        "skillsUsed": ["Next.js", "Prisma", "PostgreSQL", "Payment systems"],
+        "duration": "6 months"
+      }
+    ],
+    "education": [{ "degree": "B.E. Computer Science", "institution": "MSRIT Bangalore", "year": 2021 }]
+  },
+
+  {
+    "name": "Naveen Rao",
+    "email": "naveen.rao@demo.com",
+    "city": "Mumbai",
+    "seniority": "junior",
+    "yearsExperience": 2,
+    "skills": [
+      { "name": "Node.js", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "Express", "category": "framework", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "MongoDB", "category": "database", "proficiency": "intermediate", "yearsExperience": 2 },
+      { "name": "TypeScript", "category": "language", "proficiency": "beginner", "yearsExperience": 1 },
+      { "name": "HIPAA / FHIR", "category": "domain", "proficiency": "beginner", "yearsExperience": 1 }
+    ],
+    "projects": [
+      {
+        "name": "Lab results ingestion",
+        "description": "Backend service ingesting HL7 lab result messages and exposing a REST API for the patient app. Wrote the parser from scratch.",
+        "skillsUsed": ["Node.js", "Express", "MongoDB", "HIPAA / FHIR"],
+        "duration": "5 months"
+      },
+      {
+        "name": "Internal admin tools",
+        "description": "Express + Mongo admin endpoints for ops to query patient records under audit logging.",
+        "skillsUsed": ["Node.js", "Express", "MongoDB"],
+        "duration": "3 months"
+      }
+    ],
+    "education": [{ "degree": "B.E. Computer Engineering", "institution": "Sardar Patel Institute of Technology, Mumbai", "year": 2023 }]
+  }
+]
