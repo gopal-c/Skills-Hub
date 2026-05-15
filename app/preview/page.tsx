@@ -231,7 +231,7 @@ export default function PreviewPage() {
           <div className="space-y-s-3">
             <span className="eyebrow">Mono — Geist Mono</span>
             <p style={{ font: "var(--t-mono)" }}>0.92 match · senior · bangalore</p>
-            <p style={{ font: "var(--t-mono-s)" }}>// hackathon · team</p>
+            <p style={{ font: "var(--t-mono-s)" }}>{"// hackathon · team"}</p>
             <span className="eyebrow eyebrow-coral">01 · The problem</span>
           </div>
           <div className="space-y-s-3">
