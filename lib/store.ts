@@ -11,6 +11,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { sql } from "@vercel/postgres";
+import bcrypt from "bcryptjs";
 
 export type Proficiency = "beginner" | "intermediate" | "advanced" | "expert";
 export type Seniority   = "junior" | "mid" | "senior" | "lead";
@@ -49,6 +50,35 @@ export type Profile = {
   status: Status;
   createdAt: string;
 };
+
+export type Role = "hr" | "employee";
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  role: Role;
+  createdAt: string;
+};
+
+type UserRow = {
+  id: string;
+  email: string;
+  password_hash: string;
+  name: string;
+  role: Role;
+  created_at: string;
+};
+
+function userRowToUser(r: UserRow): User {
+  return {
+    id: r.id,
+    email: r.email,
+    name: r.name,
+    role: r.role,
+    createdAt: r.created_at,
+  };
+}
 
 type Row = {
   id: string;
@@ -93,6 +123,45 @@ export async function createSchema(): Promise<void> {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL CHECK (role IN ('hr','employee')),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+}
+
+const DEMO_USERS: Array<{ email: string; name: string; role: Role; password: string }> = [
+  { email: "hr@demo.com",       name: "HR Demo",       role: "hr",       password: "Demo@123" },
+  { email: "employee@demo.com", name: "Employee Demo", role: "employee", password: "Demo@123" },
+];
+
+export async function seedUsers(): Promise<number> {
+  let inserted = 0;
+  for (const u of DEMO_USERS) {
+    const hash = await bcrypt.hash(u.password, 10);
+    const id = randomUUID();
+    const { rowCount } = await sql`
+      INSERT INTO users (id, email, password_hash, name, role)
+      VALUES (${id}, ${u.email}, ${hash}, ${u.name}, ${u.role})
+      ON CONFLICT (email) DO NOTHING
+    `;
+    if ((rowCount ?? 0) > 0) inserted++;
+  }
+  return inserted;
+}
+
+export async function getUserByEmail(email: string): Promise<(User & { passwordHash: string }) | undefined> {
+  await ensureSeeded();
+  const { rows } = await sql<UserRow>`
+    SELECT * FROM users WHERE email = ${email.toLowerCase()} LIMIT 1
+  `;
+  if (!rows[0]) return undefined;
+  return { ...userRowToUser(rows[0]), passwordHash: rows[0].password_hash };
 }
 
 /* ─────────── Lazy seed on first read ─────────── */
@@ -102,8 +171,9 @@ let bootstrapPromise: Promise<void> | null = null;
 async function ensureSeeded(): Promise<void> {
   if (bootstrapPromise) return bootstrapPromise;
   bootstrapPromise = (async () => {
-    // Idempotent — creates the table on the first read if /api/init was skipped.
+    // Idempotent — creates the tables on the first read if /api/init was skipped.
     await createSchema();
+    await seedUsers();
 
     const { rows } = await sql<{ c: number }>`SELECT COUNT(*)::int AS c FROM profiles`;
     if ((rows[0]?.c ?? 0) > 0) return;

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSchema } from "@/lib/store";
+import { createSchema, seedUsers } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await createSchema();
-    return NextResponse.json({ ok: true });
+    const usersInserted = await seedUsers();
+    return NextResponse.json({ ok: true, usersInserted });
   } catch (err) {
     const message = err instanceof Error ? err.message : "init failed";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
