@@ -36,7 +36,7 @@ export function RoleHeader({ session, eyebrow }: { session: SessionPayload; eyeb
           <RoleNavLinks items={nav} />
           <div className="hidden h-6 w-px bg-border-hairline md:block" />
           <div className="flex items-center gap-s-2">
-            <ProfileAvatar name={session.name} email={session.email} className="size-8" />
+            <ProfileAvatar name={session.name} className="size-8" />
             <span className="hidden text-[13px] text-fg-1 md:inline">{session.name}</span>
           </div>
           <SignOutButton />

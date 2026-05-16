@@ -20,22 +20,21 @@ function initial(name: string): string {
 
 type Props = {
   name: string;
-  email: string;
-  /** Tailwind size class, e.g. "size-10", "size-14". Default size-10 (40px). */
+  /** A URL or data: URL pulled straight from the DB. `null`/`undefined` → gradient initials. */
+  avatarUrl?: string | null;
+  /** Tailwind size class, e.g. "size-10", "size-16". Default size-10 (40px). */
   className?: string;
 };
 
 /**
- * Profile avatar — pravatar image keyed by email (deterministic),
- * with the gradient-initials treatment as fallback when the image
- * fails or hasn't loaded yet.
+ * Profile avatar — renders the stored avatar_url when present, otherwise
+ * shows a gradient + initial fallback. No URL construction logic; reads
+ * exactly what the DB provides.
  */
-export function ProfileAvatar({ name, email, className }: Props) {
-  const src = `https://i.pravatar.cc/150?u=${encodeURIComponent(email || name)}`;
-
+export function ProfileAvatar({ name, avatarUrl, className }: Props) {
   return (
     <Avatar className={cn("size-10 after:hidden", className)}>
-      <AvatarImage src={src} alt={name} />
+      {avatarUrl ? <AvatarImage src={avatarUrl} alt={name} /> : null}
       <AvatarFallback
         className="font-medium text-white"
         style={{ background: gradientFor(name) }}

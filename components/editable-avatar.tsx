@@ -144,7 +144,7 @@ export function EditableAvatar({
       >
         <ProfileAvatar
           name={profile.name}
-          email={profile.email}
+          avatarUrl={profile.avatarUrl}
           className={className ?? "size-16"}
         />
         <span

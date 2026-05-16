@@ -45,7 +45,7 @@ export default async function ReviewQueuePage() {
                       <div className="flex items-center gap-s-3">
                         <ProfileAvatar
                           name={p.name || "?"}
-                          email={p.email}
+                          avatarUrl={p.avatarUrl}
                           className="size-10 flex-shrink-0"
                         />
                         <div className="min-w-0 flex-1">

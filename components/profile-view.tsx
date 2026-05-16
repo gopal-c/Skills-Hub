@@ -62,7 +62,7 @@ export function ProfileView({
           {editableAvatar ? (
             <EditableAvatar profile={profile} className="size-16 flex-shrink-0" />
           ) : (
-            <ProfileAvatar name={profile.name} email={profile.email} className="size-16 flex-shrink-0" />
+            <ProfileAvatar name={profile.name} avatarUrl={profile.avatarUrl} className="size-16 flex-shrink-0" />
           )}
           <div>
             <span className="eyebrow eyebrow-indigo">{profile.seniority}</span>
