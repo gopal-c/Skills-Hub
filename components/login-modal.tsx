@@ -14,16 +14,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ROLE_HOME, type Role } from "@/lib/auth";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prefillEmail: string;
-};
-
-const ROLE_HOME: Record<"hr" | "employee", string> = {
-  hr:       "/search",
-  employee: "/upload",
 };
 
 export function LoginModal({ open, onOpenChange, prefillEmail }: Props) {
@@ -59,7 +55,7 @@ export function LoginModal({ open, onOpenChange, prefillEmail }: Props) {
         }
         toast.success("Welcome back.");
         onOpenChange(false);
-        const target = ROLE_HOME[data.role as "hr" | "employee"];
+        const target = ROLE_HOME[data.role as Role];
         router.push(target);
         router.refresh();
       } catch {
