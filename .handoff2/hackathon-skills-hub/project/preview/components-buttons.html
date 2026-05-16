@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .btn { font:var(--t-label); padding: 10px 16px; border-radius: var(--r-md); border:1px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition: all var(--t-base) var(--ease-out); }
+  .btn--primary { background: var(--brand-indigo-deep); color: #fff; }
+  .btn--primary:hover { background: var(--brand-indigo-press); }
+  .btn--secondary { background: var(--bg-surface); color: var(--fg-1); border-color: var(--border-strong); }
+  .btn--secondary:hover { background: var(--ink-100); }
+  .btn--ghost { background: transparent; color: var(--fg-1); }
+  .btn--ghost:hover { background: var(--ink-100); }
+  .btn--danger { background: var(--brand-coral-deep); color: #fff; }
+  .btn--coral-soft { background: var(--brand-coral-soft); color: var(--brand-coral-deep); }
+  .btn--sm { padding: 6px 10px; font-size: 12px; border-radius: var(--r-sm); }
+  .btn--lg { padding: 14px 22px; font-size: 15px; border-radius: var(--r-lg); }
+  .btn--icon { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 999px; background: var(--ink-100); border:none; color: var(--fg-1); }
+  .row + .row { margin-top: 12px; }
+  .lbl { font:var(--t-mono-s); color:var(--fg-2); width: 96px; flex-shrink:0; }
+</style></head>
+<body>
+  <div class="row" style="align-items:center">
+    <div class="lbl">Primary</div>
+    <button class="btn btn--primary">Run search</button>
+    <button class="btn btn--primary btn--sm">Save</button>
+    <button class="btn btn--primary btn--lg">Upload resume →</button>
+  </div>
+  <div class="row" style="align-items:center">
+    <div class="lbl">Secondary</div>
+    <button class="btn btn--secondary">Cancel</button>
+    <button class="btn btn--ghost">Skip for now</button>
+    <button class="btn btn--coral-soft">Why this match?</button>
+  </div>
+  <div class="row" style="align-items:center">
+    <div class="lbl">Other</div>
+    <button class="btn btn--danger">Delete profile</button>
+    <button class="btn btn--icon" title="more">⋯</button>
+    <button class="btn btn--primary" disabled style="opacity:0.45;cursor:not-allowed">Disabled</button>
+  </div>
+</body></html>

@@ -50,7 +50,7 @@ export default function Home() {
 
       <footer className="relative z-10 mx-auto max-w-6xl px-s-8 pb-s-8">
         <p className="font-mono text-[11px] uppercase tracking-eyebrow text-ink-500">
-          {"// hackathon · SkillsHub"}
+          {"// hackathon · z-index: 9999;"}
         </p>
       </footer>
     </main>

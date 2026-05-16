@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { background: var(--bg-page); }
+  .card { background:var(--bg-surface); border:1px solid var(--border-hairline); border-radius: var(--r-lg); padding: 16px 18px; box-shadow: var(--shadow-2); display:flex; flex-direction:column; gap:8px; }
+  .av { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#8B7BE8,#FF9A82); color:#fff; font:var(--t-label); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .row.h { display:flex; align-items:center; gap:10px; }
+  .name { font:var(--t-h4); }
+  .role { font:var(--t-body-s); color:var(--fg-2); }
+  .score { margin-left:auto; font:var(--t-mono); background:var(--ink-900); color:#fff; padding:3px 9px; border-radius:7px; }
+  .reason { font:var(--t-body-s); color:var(--fg-1); line-height:1.55; padding: 8px 10px; border-radius: var(--r-sm); background: var(--brand-indigo-soft); border-left: 0; }
+  .skills { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { font:var(--t-mono-s); padding:3px 9px; border-radius:999px; background:var(--ink-100); color:var(--fg-1); }
+</style></head>
+<body>
+  <div class="card">
+    <div class="row h">
+      <div class="av">PR</div>
+      <div>
+        <div class="name">Priya R.</div>
+        <div class="role">Staff engineer · Payments team</div>
+      </div>
+      <div class="score">0.92</div>
+    </div>
+    <div class="reason"><b style="font-weight:600">Why this match</b> · 5 yrs React in production, led Stripe + Adyen integrations at her last two roles. Most recent project: tokenized checkout for a B2B SaaS.</div>
+    <div class="skills">
+      <span class="chip">React · 5y</span>
+      <span class="chip">TypeScript · 5y</span>
+      <span class="chip">Payments · 3y</span>
+      <span class="chip">+ 12 more</span>
+    </div>
+  </div>
+</body></html>

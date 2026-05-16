@@ -1,0 +1,88 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  .feature-row { display: flex; gap: 10px; }
+  .feature-row > * { flex: 1; }
+
+  .feature {
+    background: #FFFFFF;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--r-md);
+    height: 130px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .feature.dark {
+    background: var(--ink-900);
+    border-color: transparent;
+    overflow: hidden;
+  }
+  .feature.dark::before {
+    content: ""; position: absolute; inset: 0;
+    background: url('../assets/glow-coral.png') 100% 100%/280px 280px no-repeat;
+    mix-blend-mode: screen; opacity: 0.5; pointer-events: none;
+  }
+  .feature img { height: 96px; position: relative; z-index: 1; }
+  .feature .meta {
+    position: absolute; bottom: 8px; left: 12px;
+    font: var(--t-mono-s); letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--fg-3); z-index: 1;
+  }
+  .feature.dark .meta { color: rgba(255,255,255,0.45); }
+
+  .lockup {
+    padding: 14px 18px;
+    border-radius: var(--r-md);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .lockup.light {
+    background: #FFFFFF;
+    border: 1px solid var(--border-hairline);
+  }
+  .lockup.dark {
+    background: var(--ink-900);
+    position: relative; overflow: hidden;
+  }
+  .lockup.dark::before {
+    content: ""; position: absolute; inset: 0;
+    background: url('../assets/glow-indigo.png') -40% 110%/240px 240px no-repeat;
+    mix-blend-mode: screen; opacity: 0.6; pointer-events: none;
+  }
+  .lockup.dark > * { position: relative; z-index: 1; }
+  .lockup img { height: 40px; }
+  .lockup .meta {
+    margin-left: auto;
+    font: var(--t-mono-s); letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--fg-3);
+  }
+  .lockup.dark .meta { color: rgba(255,255,255,0.45); }
+</style></head>
+<body>
+  <!-- Mark on light + dark surfaces. The gradient runs coral → amber → teal → indigo
+       top-to-bottom; the white variant takes over when the background is busy. -->
+  <div class="feature-row">
+    <div class="feature">
+      <img src="../assets/logo-mark.svg" alt="SkillsHub mark">
+      <span class="meta">primary · gradient</span>
+    </div>
+    <div class="feature dark">
+      <img src="../assets/logo-mark.svg" alt="SkillsHub mark">
+      <span class="meta">on ink · gradient</span>
+    </div>
+    <div class="feature dark" style="background:#6B58D9">
+      <img src="../assets/logo-mark-light.svg" alt="SkillsHub mark">
+      <span class="meta">on brand · mono</span>
+    </div>
+  </div>
+
+  <div class="lockup light">
+    <img src="../assets/logo-wordmark.svg" alt="SkillsHub">
+    <span class="meta">light lockup</span>
+  </div>
+  <div class="lockup dark">
+    <img src="../assets/logo-wordmark-dark.svg" alt="SkillsHub">
+    <span class="meta">dark lockup</span>
+  </div>
+</body></html>

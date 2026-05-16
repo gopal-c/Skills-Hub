@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillsHub — Search</title>
+  <link rel="stylesheet" href="../../colors_and_type.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font: var(--t-body);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    
+    /* ── Page shell ────────────────────────────────────────── */
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 64px 32px 80px;
+    }
+
+    .eyebrow {
+      font: var(--t-mono-s); letter-spacing: var(--tracking-eyebrow);
+      text-transform: uppercase; color: var(--brand-indigo-deep);
+    }
+    .h-title {
+      font: 600 48px/1.1 var(--font-sans);
+      letter-spacing: -0.025em;
+      color: var(--fg-1);
+      margin: 8px 0 14px;
+    }
+    .h-title em {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--brand-indigo-deep);
+    }
+    .h-sub {
+      font: var(--t-body-l);
+      color: var(--fg-2);
+      max-width: 540px;
+    }
+
+    /* ── Search bar (frosted, pill, with embedded button) ──── */
+    .search {
+      margin: 32px 0 24px;
+      position: relative;
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 8px 8px 18px;
+      background: linear-gradient(155deg,
+                    rgba(255, 255, 255, 0.65) 0%,
+                    rgba(255, 255, 255, 0.42) 60%,
+                    rgba(255, 255, 255, 0.55) 100%);
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 999px;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 12px 28px -14px rgba(21, 22, 52, 0.16),
+        0 2px 6px rgba(21, 22, 52, 0.04);
+    }
+    .search:focus-within {
+      border-color: rgba(139, 123, 232, 0.55);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 0 0 4px rgba(139, 123, 232, 0.16),
+        0 16px 32px -14px rgba(21, 22, 52, 0.2);
+    }
+    .search > svg.ic { color: var(--fg-3); flex-shrink: 0; }
+    .search input {
+      flex: 1; border: none; outline: none; background: transparent;
+      font: var(--t-body-l); color: var(--fg-1);
+      padding: 12px 4px;
+    }
+    .search input::placeholder { color: var(--fg-3); }
+    .search button.go {
+      background: var(--brand-indigo-deep); color: #fff;
+      border: none; border-radius: 999px;
+      padding: 0 22px; height: 44px;
+      font: var(--t-label);
+      display: inline-flex; align-items: center; gap: 8px;
+      cursor: pointer;
+      transition: background var(--t-base) var(--ease-out),
+                  transform var(--t-fast) var(--ease-out);
+      box-shadow: 0 4px 12px rgba(91, 71, 224, 0.25);
+    }
+    .search button.go:hover { background: var(--brand-indigo-press); }
+    .search button.go:active { transform: scale(0.97); }
+
+    /* ── Try-chips row ─────────────────────────────────────── */
+    .suggested {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 28px;
+    }
+    .suggested .lbl {
+      font: var(--t-mono-s); letter-spacing: var(--tracking-eyebrow);
+      text-transform: uppercase; color: var(--fg-2);
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(232, 232, 240, 0.9);
+      border-radius: 999px;
+      font: var(--t-label); color: var(--fg-1);
+      cursor: pointer;
+      transition: all var(--t-fast) var(--ease-out);
+    }
+    .chip:hover {
+      background: rgba(255,255,255,0.85);
+      border-color: rgba(139, 123, 232, 0.4);
+      color: var(--brand-indigo-deep);
+    }
+
+    /* ── Results header ────────────────────────────────────── */
+    .results-meta {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin: 24px 0 16px;
+    }
+    .results-meta .count {
+      font: var(--t-mono-s); letter-spacing: var(--tracking-eyebrow);
+      text-transform: uppercase;
+      color: var(--brand-indigo-deep);
+    }
+    .results-meta .count b { color: var(--fg-1); font-weight: 600; margin-right: 2px; }
+    .results-meta .sort { font: var(--t-mono-s); color: var(--fg-3); }
+
+    .results { display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── Frosted result card ───────────────────────────────── */
+    .card {
+      position: relative;
+      padding: 22px 24px;
+      border-radius: 22px;
+      cursor: pointer;
+      background: linear-gradient(155deg,
+                    rgba(255, 255, 255, 0.58) 0%,
+                    rgba(255, 255, 255, 0.36) 60%,
+                    rgba(255, 255, 255, 0.50) 100%);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.18) inset,
+        0 22px 46px -20px rgba(21, 22, 52, 0.20),
+        0 4px 12px rgba(21, 22, 52, 0.05);
+      transition: transform var(--t-base) var(--ease-spring),
+                  box-shadow var(--t-base) var(--ease-out);
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.18) inset,
+        0 28px 52px -18px rgba(21, 22, 52, 0.26),
+        0 6px 16px rgba(91, 71, 224, 0.12);
+    }
+    /* Diagonal sheen */
+    .card::before {
+      content: ""; position: absolute; inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg,
+                    rgba(255,255,255,0.55) 0%,
+                    rgba(255,255,255,0.08) 30%,
+                    transparent 50%,
+                    rgba(255,255,255,0.10) 75%,
+                    rgba(255,255,255,0.30) 100%);
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    .card-head { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font: 600 17px/1 var(--font-sans);
+      box-shadow:
+        0 6px 14px rgba(21, 22, 52, 0.18),
+        0 0 0 3px rgba(255,255,255,0.65);
+    }
+    .avatar-wrap::before {
+      content: "";
+      position: absolute; inset: -10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--halo, rgba(139,123,232,0.30)) 0%, transparent 65%);
+      filter: blur(6px);
+      z-index: -1;
+    }
+    .name {
+      font: 600 17px/1.25 var(--font-sans);
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+    }
+    .meta {
+      font: var(--t-body-s); color: var(--fg-2);
+      margin-top: 2px;
+    }
+    .meta .lvl { color: var(--brand-indigo-deep); font-weight: 500; }
+
+    /* ── Score badge ───────────────────────────────────────── */
+    .score {
+      margin-left: auto;
+      display: inline-flex; align-items: baseline; gap: 4px;
+      padding: 9px 14px;
+      border-radius: 12px;
+      background: var(--ink-900);
+      color: rgba(255,255,255,0.55);
+      font: var(--t-mono);
+      box-shadow: 0 4px 10px rgba(21, 22, 52, 0.22);
+    }
+    .score b {
+      font: 600 17px/1 var(--font-sans);
+      color: var(--brand-teal);
+      letter-spacing: -0.01em;
+    }
+    .score.warm b { color: var(--brand-amber); }
+    .score.cool b { color: #B8B8D0; }
+
+    /* ── Reason banner ─────────────────────────────────────── */
+    .reason {
+      position: relative; z-index: 1;
+      font: var(--t-body);
+      color: var(--fg-1);
+      line-height: 1.55;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(139, 123, 232, 0.12);
+      border: 1px solid rgba(139, 123, 232, 0.18);
+    }
+    .reason b {
+      font: var(--t-mono-s);
+      letter-spacing: var(--tracking-eyebrow);
+      text-transform: uppercase;
+      color: var(--brand-indigo-deep);
+      margin-right: 8px;
+    }
+
+    /* ── Skill chips ───────────────────────────────────────── */
+    .skills { display: flex; gap: 6px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .skill {
+      font: var(--t-mono-s);
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(232, 232, 240, 0.85);
+      color: var(--fg-1);
+    }
+    .skill.match {
+      background: rgba(124, 211, 197, 0.22);
+      border-color: rgba(124, 211, 197, 0.45);
+      color: #2D8478;
+      font-weight: 500;
+    }
+
+    /* ── Empty state (also frosted) ────────────────────────── */
+    .empty {
+      position: relative;
+      margin-top: 18px;
+      padding: 48px 32px;
+      border-radius: 22px;
+      text-align: center;
+      background: linear-gradient(155deg,
+                    rgba(255, 255, 255, 0.55) 0%,
+                    rgba(255, 255, 255, 0.32) 60%,
+                    rgba(255, 255, 255, 0.48) 100%);
+      backdrop-filter: blur(36px) saturate(180%);
+      -webkit-backdrop-filter: blur(36px) saturate(180%);
+      border: 1px dashed rgba(139, 123, 232, 0.30);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.85) inset, 0 12px 30px -14px rgba(21,22,52,0.10);
+    }
+    .empty .ey { font: var(--t-mono-s); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-3); }
+    .empty h3 {
+      font: 600 24px/1.2 var(--font-sans);
+      letter-spacing: -0.015em;
+      margin: 8px 0 10px;
+    }
+    .empty h3 em {
+      font-family: var(--font-display); font-style: italic; font-weight: 400;
+      color: var(--brand-indigo-deep);
+    }
+    .empty p { font: var(--t-body); color: var(--fg-2); max-width: 480px; margin: 0 auto; }
+
+    /* Hide either branch */
+    body[data-state="empty"] .results-meta,
+    body[data-state="empty"] .results { display: none; }
+    body[data-state="results"] .empty,
+    body[data-state="results"] .suggested { display: none; }
+  </style>
+</head>
+<body data-theme="light" data-state="results">
+
+
+  <div class="theme-glow g1"></div>
+  <div class="theme-glow g2"></div>
+  <div class="theme-glow g3"></div>
+  <header class="topbar">
+    <img class="theme-logo-light" src="../../assets/logo-wordmark.svg" alt="SkillsHub">
+    <img class="theme-logo-dark"  src="../../assets/logo-wordmark-dark.svg" alt="SkillsHub">
+    <span class="divider">/</span>
+    <span class="crumb"><b>HR</b> · Search</span>
+    <div class="right">
+      <span class="role">role: <b>HR</b></span>
+      <span class="tab active">Directory</span>
+      <span class="tab">Switch role</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="eyebrow">Search</div>
+    <h1 class="h-title">Find the right person, <em>in plain English.</em></h1>
+    <p class="h-sub">Ask a question the way you'd ask a teammate. We'll rank candidates and tell you why each one matched.</p>
+
+    <div class="search">
+      <svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" value="Mid-level full-stack with TypeScript and AWS"
+             placeholder="Ask in plain English — who knows X and has shipped Y?">
+      <button class="go">Search →</button>
+    </div>
+
+    <!-- Empty-state branch (shown when state="empty") -->
+    <div class="suggested">
+      <span class="lbl">Try</span>
+      <button class="chip" onclick="setQ('Who knows React AND has worked on payment integrations?')">Who knows React AND has worked on payment integrations?</button>
+      <button class="chip" onclick="setQ('Senior backend engineers in Bangalore with Kafka experience')">Senior backend engineers in Bangalore with Kafka experience</button>
+      <button class="chip" onclick="setQ('Anyone with HIPAA / healthcare background?')">Anyone with HIPAA / healthcare background?</button>
+      <button class="chip" onclick="setQ('Mid-level full-stack with TypeScript and AWS')">Mid-level full-stack with TypeScript and AWS</button>
+    </div>
+    <div class="empty">
+      <div class="ey">Ready</div>
+      <h3>Ask your <em>first question.</em></h3>
+      <p>14 approved profiles indexed. Each result comes with a one-line reason you can trust.</p>
+    </div>
+
+    <!-- Results branch -->
+    <div class="results-meta">
+      <span class="count"><b>3</b> matches</span>
+      <span class="sort">ranked by relevance</span>
+    </div>
+    <div class="results" id="results"></div>
+  </main>
+
+  <script>
+    const setQ = (s) => {
+      document.getElementById('q').value = s;
+      document.body.dataset.state = 'results';
+    };
+
+    const PEOPLE = [
+      {
+        name: 'Tara Banerjee', initials: 'T',
+        grad: ['#7CD3C5', '#FFCB6B'],
+        halo: 'rgba(124,211,197,0.40)',
+        level: 'mid', loc: 'Bangalore', yrs: 5,
+        score: 80,
+        reason: 'Built a Next.js + TypeScript storefront with AWS',
+        skills: [
+          { name: 'Next.js',        match: true  },
+          { name: 'React',          match: false },
+          { name: 'TypeScript',     match: true  },
+          { name: 'Design systems', match: false },
+          { name: 'Figma',          match: false },
+          { name: 'Storybook',      match: false },
+        ],
+      },
+      {
+        name: 'Riya Gupta', initials: 'R',
+        grad: ['#7CD3C5', '#8B7BE8'],
+        halo: 'rgba(124,211,197,0.40)',
+        level: 'mid', loc: 'Bangalore', yrs: 4,
+        score: 70,
+        reason: 'Used TypeScript and AWS in multiple projects',
+        skills: [
+          { name: 'Next.js',         match: false },
+          { name: 'TypeScript',      match: true  },
+          { name: 'tRPC',            match: false },
+          { name: 'Prisma',          match: false },
+          { name: 'PostgreSQL',      match: false },
+          { name: 'Payment systems', match: false },
+          { name: 'Open banking APIs', match: false },
+        ],
+      },
+      {
+        name: 'Aditya Nair', initials: 'A',
+        grad: ['#8B7BE8', '#FF9A82'],
+        halo: 'rgba(139,123,232,0.35)',
+        level: 'senior', loc: 'Pune', yrs: 9,
+        score: 62, tone: 'warm',
+        reason: 'TypeScript projects with backend AWS infra; senior level',
+        skills: [
+          { name: 'Java',          match: false },
+          { name: 'TypeScript',    match: true  },
+          { name: 'AWS',           match: true  },
+          { name: 'Spring Boot',   match: false },
+          { name: 'Elasticsearch', match: false },
+        ],
+      },
+    ];
+
+    const results = document.getElementById('results');
+    PEOPLE.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      const scoreClass = p.tone === 'warm' ? 'score warm' : (p.score >= 75 ? 'score' : 'score');
+      el.innerHTML = `
+        <div class="card-head">
+          <div class="avatar-wrap" style="--halo: ${p.halo};">
+            <div class="avatar" style="background: linear-gradient(135deg, ${p.grad[0]}, ${p.grad[1]});">${p.initials}</div>
+          </div>
+          <div>
+            <div class="name">${p.name}</div>
+            <div class="meta"><span class="lvl">${p.level}</span> · ${p.loc} · ${p.yrs} yrs</div>
+          </div>
+          <span class="${p.tone === 'warm' ? 'score warm' : 'score'}"><b>${p.score}</b><span> / 100</span></span>
+        </div>
+        <div class="reason"><b>Why</b>${p.reason}</div>
+        <div class="skills">
+          ${p.skills.map(s => `<span class="skill${s.match ? ' match' : ''}">${s.name}</span>`).join('')}
+        </div>
+      `;
+      results.appendChild(el);
+    });
+  </script>
+</body>
+</html>

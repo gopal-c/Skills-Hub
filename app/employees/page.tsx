@@ -10,10 +10,19 @@ export default async function EmployeesDirectoryPage() {
   const session = await requireRole("any");
   const profiles = await getApprovedProfiles();
 
+  const theme = session.role === "hr" ? "light" : "dark";
+
   return (
-    <main className="min-h-screen bg-bg-page">
+    <div data-theme={theme} className="theme-shell">
+      {theme === "dark" && (
+        <>
+          <div className="theme-glow g1" aria-hidden />
+          <div className="theme-glow g2" aria-hidden />
+          <div className="theme-glow g3" aria-hidden />
+        </>
+      )}
       <RoleHeader session={session} eyebrow="Directory" />
-      <section className="mx-auto max-w-6xl px-s-8 py-s-12">
+      <section className="relative z-[1] mx-auto max-w-6xl px-s-8 py-s-12">
         <span className="eyebrow">Directory</span>
         <h1 className="mt-s-2">
           {profiles.length} {profiles.length === 1 ? "person" : "people"}
@@ -39,6 +48,6 @@ export default async function EmployeesDirectoryPage() {
           <DirectoryGrid profiles={profiles} />
         )}
       </section>
-    </main>
+    </div>
   );
 }

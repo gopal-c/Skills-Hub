@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillsHub — Directory</title>
+  <link rel="stylesheet" href="../../colors_and_type.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font: var(--t-body);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    
+
+    /* ── Page header ───────────────────────────────────────── */
+    .page { max-width: 1240px; margin: 0 auto; padding: 56px 32px 64px; }
+    .eyebrow {
+      font: var(--t-mono-s); letter-spacing: var(--tracking-eyebrow);
+      text-transform: uppercase; color: var(--fg-2);
+    }
+    .h-title {
+      font: 600 56px/1.05 var(--font-sans);
+      letter-spacing: -0.025em;
+      color: var(--fg-1);
+      margin: 6px 0 8px;
+    }
+    .h-sub { font: var(--t-body-l); color: var(--fg-2); max-width: 620px; }
+
+    /* ── Toolbar ───────────────────────────────────────────── */
+    .toolbar {
+      margin: 28px 0 22px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .search {
+      flex: 1; max-width: 420px;
+      position: relative;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(232, 232, 240, 0.9);
+      border-radius: var(--r-pill);
+      padding: 8px 14px 8px 38px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, var(--shadow-1);
+    }
+    .search input {
+      width: 100%; border: none; outline: none; background: transparent;
+      font: var(--t-body); color: var(--fg-1);
+    }
+    .search input::placeholder { color: var(--fg-3); }
+    .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--fg-3); }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 13px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(232, 232, 240, 0.9);
+      border-radius: var(--r-pill);
+      font: var(--t-label); color: var(--fg-1);
+      cursor: pointer;
+      transition: all var(--t-fast) var(--ease-out);
+    }
+    .chip:hover { background: rgba(255,255,255,0.85); }
+    .chip.active { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
+
+    /* ── Card grid ─────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* ── The frosted-glass card ────────────────────────────── */
+    .card {
+      position: relative;
+      padding: 22px;
+      border-radius: 22px;
+      cursor: pointer;
+      /* The frost — translucent white with a strong blur. The 1px white
+         inset border simulates the rim-light on glass. */
+      background: linear-gradient(155deg,
+                    rgba(255, 255, 255, 0.72) 0%,
+                    rgba(255, 255, 255, 0.52) 60%,
+                    rgba(255, 255, 255, 0.62) 100%);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 18px 40px -16px rgba(21, 22, 52, 0.16),
+        0 2px 8px rgba(21, 22, 52, 0.04);
+      transition: transform var(--t-base) var(--ease-spring),
+                  box-shadow var(--t-base) var(--ease-out);
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 24px 50px -16px rgba(21, 22, 52, 0.22),
+        0 4px 12px rgba(91, 71, 224, 0.10);
+    }
+    /* Subtle inner sheen — diagonal highlight that mimics light on glass */
+    .card::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg,
+                    rgba(255,255,255,0.45) 0%,
+                    transparent 30%,
+                    transparent 70%,
+                    rgba(255,255,255,0.18) 100%);
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    .card-head { display: flex; align-items: center; gap: 14px; }
+    .avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font: 300 16px/1 var(--font-sans);
+      letter-spacing: 0.01em;
+      box-shadow: 0 4px 10px rgba(21, 22, 52, 0.15),
+                  0 0 0 3px rgba(255,255,255,0.55);
+    }
+    .name { font: 600 17px/1.25 var(--font-sans); color: var(--fg-1); }
+    .meta { font: var(--t-body-s); color: var(--fg-2); margin-top: 2px; }
+    .meta .lvl { color: var(--brand-indigo-deep); font-weight: 500; }
+
+    .skills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .skill {
+      font: var(--t-mono-s);
+      padding: 4px 10px;
+      border-radius: 7px;
+      background: rgba(244, 244, 248, 0.7);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(232, 232, 240, 0.8);
+      color: var(--fg-1);
+    }
+    .skill.more {
+      background: rgba(26, 26, 46, 0.85);
+      color: #fff;
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+
+  <div class="theme-glow g1"></div>
+  <div class="theme-glow g2"></div>
+  <div class="theme-glow g3"></div>
+  <header class="topbar">
+    <img class="theme-logo-light" src="../../assets/logo-wordmark.svg" alt="SkillsHub">
+    <img class="theme-logo-dark"  src="../../assets/logo-wordmark-dark.svg" alt="SkillsHub">
+    <span class="divider">/</span>
+    <span class="crumb">Directory</span>
+    <div class="right">
+      <span class="role">role: <b>HR</b></span>
+      <span class="tab active">Directory</span>
+      <span class="tab">Switch role</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="eyebrow">Directory</div>
+    <h1 class="h-title">14 people</h1>
+    <p class="h-sub">Approved profiles, ready to be searched. Click any card to see the full picture.</p>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input placeholder="Find anyone — name, skill, location…">
+      </div>
+      <button class="chip active">All</button>
+      <button class="chip">Engineering</button>
+      <button class="chip">Design</button>
+      <button class="chip">Senior+</button>
+      <button class="chip">Remote</button>
+    </div>
+
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <script>
+    const PEOPLE = [
+      { name: 'Naveen Rao',      level: 'junior', loc: 'Mumbai',     yrs: 2,  skills: ['Node.js', 'Express', 'MongoDB', 'TypeScript', 'HIPAA / FHIR'], grad: ['#FF9A82','#FFCB6B'] },
+      { name: 'Riya Gupta',      level: 'mid',    loc: 'Bangalore',  yrs: 4,  skills: ['Next.js', 'TypeScript', 'tRPC', 'Prisma', 'PostgreSQL', '+2'], grad: ['#8B7BE8','#FF9A82'] },
+      { name: 'Aditya Nair',     level: 'senior', loc: 'Pune',       yrs: 9,  skills: ['Java', 'Apache Kafka', 'Elasticsearch', 'Search relevance', 'Spring Boot', '+1'], grad: ['#7CD3C5','#8B7BE8'] },
+      { name: 'Ishita Choudhary',level: 'junior', loc: 'Remote',     yrs: 2,  skills: ['React', 'TypeScript', 'Storybook', 'Design tokens', 'CSS / Tailwind'], grad: ['#FFCB6B','#FF9A82'] },
+      { name: 'Devansh Patel',   level: 'senior', loc: 'Hyderabad',  yrs: 7,  skills: ['Python', 'FastAPI', 'PyTorch', 'NLP', 'HIPAA / FHIR', '+1'], grad: ['#8B7BE8','#7CD3C5'] },
+      { name: 'Tara Banerjee',   level: 'mid',    loc: 'Bangalore',  yrs: 5,  skills: ['Next.js', 'React', 'TypeScript', 'Design systems', 'Figma', '+1'], grad: ['#FF9A82','#8B7BE8'] },
+      { name: 'Karan Joshi',     level: 'lead',   loc: 'Mumbai',     yrs: 13, skills: ['TypeScript', 'Node.js', 'GraphQL', 'Microservices', 'Team leadership', '+2'], grad: ['#7CD3C5','#FFCB6B'] },
+      { name: 'Meera Krishnan',  level: 'mid',    loc: 'Pune',       yrs: 5,  skills: ['React Native', 'TypeScript', 'Node.js', 'HIPAA / FHIR', 'GraphQL'], grad: ['#FFCB6B','#7CD3C5'] },
+      { name: 'Arjun Singh',     level: 'junior', loc: 'Bangalore',  yrs: 1,  skills: ['Python', 'FastAPI', 'Click', 'PostgreSQL', 'Docker'], grad: ['#FF9A82','#FFCB6B'] },
+    ];
+
+    const initials = n => n.split(' ').map(s => s[0]).join('').slice(0, 2);
+
+    const grid = document.getElementById('grid');
+    for (const p of PEOPLE) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-head">
+          <div class="avatar" style="background: linear-gradient(135deg, ${p.grad[0]}, ${p.grad[1]});">${initials(p.name)}</div>
+          <div>
+            <div class="name">${p.name}</div>
+            <div class="meta"><span class="lvl">${p.level}</span> · ${p.loc} · ${p.yrs} yrs</div>
+          </div>
+        </div>
+        <div class="skills">
+          ${p.skills.map(s => `<span class="skill${s.startsWith('+') ? ' more' : ''}">${s}</span>`).join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+  </script>
+</body>
+</html>

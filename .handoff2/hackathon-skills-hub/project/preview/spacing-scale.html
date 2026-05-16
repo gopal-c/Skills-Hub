@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .stack { display:flex; align-items:flex-end; gap:12px; }
+  .step { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .step .bar { background: var(--brand-indigo); border-radius: 3px; width: 30px; }
+  .step .nm  { font:var(--t-mono-s); color:var(--fg-2); }
+  .step .px  { font:var(--t-caption); color:var(--fg-3); }
+</style></head>
+<body>
+  <div class="stack">
+    <div class="step"><div class="bar" style="height:4px"></div><div class="nm">s-1</div><div class="px">4</div></div>
+    <div class="step"><div class="bar" style="height:8px"></div><div class="nm">s-2</div><div class="px">8</div></div>
+    <div class="step"><div class="bar" style="height:12px"></div><div class="nm">s-3</div><div class="px">12</div></div>
+    <div class="step"><div class="bar" style="height:16px"></div><div class="nm">s-4</div><div class="px">16</div></div>
+    <div class="step"><div class="bar" style="height:20px"></div><div class="nm">s-5</div><div class="px">20</div></div>
+    <div class="step"><div class="bar" style="height:24px"></div><div class="nm">s-6</div><div class="px">24</div></div>
+    <div class="step"><div class="bar" style="height:32px"></div><div class="nm">s-8</div><div class="px">32</div></div>
+    <div class="step"><div class="bar" style="height:40px"></div><div class="nm">s-10</div><div class="px">40</div></div>
+    <div class="step"><div class="bar" style="height:48px"></div><div class="nm">s-12</div><div class="px">48</div></div>
+    <div class="step"><div class="bar" style="height:64px"></div><div class="nm">s-16</div><div class="px">64</div></div>
+    <div class="step"><div class="bar" style="height:80px"></div><div class="nm">s-20</div><div class="px">80</div></div>
+  </div>
+  <div class="sub" style="margin-top:12px">4px base scale. Component padding is always a token; cards default to <code style="font:var(--t-mono-s)">s-6 (24px)</code>.</div>
+</body></html>

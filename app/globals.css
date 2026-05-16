@@ -195,3 +195,116 @@
   /* Italic serif phrase mid-sentence (e.g. "Skills, explained.") */
   .serif-italic { font-family: var(--font-display); font-style: italic; font-weight: 400; }
 }
+
+/* ────────────────────────────────────────────────────────────
+   THEME TOKENS — data-theme="light" | "dark" on a page wrapper.
+   ──────────────────────────────────────────────────────────── */
+
+[data-theme="light"] {
+  --t-bg-base: #FAFAFC;
+  --t-bg-overlay:
+    radial-gradient(900px 600px at 8% -10%,  rgba(139,123,232,0.22), transparent 60%),
+    radial-gradient(800px 600px at 100% 20%, rgba(255,154,130,0.18), transparent 60%),
+    radial-gradient(900px 700px at 50% 110%, rgba(124,211,197,0.18), transparent 60%),
+    radial-gradient(700px 500px at -10% 70%, rgba(255,203,107,0.16), transparent 60%);
+  --t-fg-1: var(--ink-800);
+  --t-fg-2: var(--ink-600);
+  --t-fg-3: var(--ink-400);
+  /* Map brand fg vars so existing text-fg-* utilities follow the theme */
+  --fg-1: var(--ink-800);
+  --fg-2: var(--ink-600);
+  --fg-3: var(--ink-400);
+  --t-accent-italic: var(--brand-coral-deep);
+  --t-accent-soft:   var(--brand-indigo-deep);
+  --t-bar-bg:        rgba(255, 255, 255, 0.55);
+  --t-bar-border:    1px solid rgba(232, 232, 240, 0.7);
+  --t-bar-divider:   var(--ink-300);
+  --t-step-idle-fg:  var(--fg-3);
+  --t-step-idle-dot: var(--ink-300);
+  --t-step-active-fg: var(--brand-coral-deep);
+  --t-step-line:     linear-gradient(90deg, var(--ink-300), transparent);
+  --t-pill-bg:       rgba(255, 255, 255, 0.5);
+  --t-pill-border:   rgba(232, 232, 240, 0.85);
+  --t-pill-fg:       var(--ink-700);
+  --t-pill-arrow:    var(--ink-300);
+  --t-glow-display:  none;
+  --t-glow-opacity:  0;
+  --t-logo-light:    block;
+  --t-logo-dark:     none;
+}
+
+[data-theme="dark"] {
+  --t-bg-base: var(--ink-900);
+  --t-bg-overlay: none;
+  --t-fg-1: #FFFFFF;
+  --t-fg-2: rgba(255, 255, 255, 0.65);
+  --t-fg-3: rgba(255, 255, 255, 0.40);
+  /* Map brand fg vars so existing text-fg-* utilities follow the theme */
+  --fg-1: #FFFFFF;
+  --fg-2: rgba(255, 255, 255, 0.65);
+  --fg-3: rgba(255, 255, 255, 0.40);
+  --border-hairline: rgba(255, 255, 255, 0.10);
+  --border-strong:   rgba(255, 255, 255, 0.18);
+  --t-accent-italic: #FFB8AB;
+  --t-accent-soft:   #FFB8AB;
+  --t-bar-bg:        rgba(21, 22, 52, 0.55);
+  --t-bar-border:    1px solid rgba(255, 255, 255, 0.08);
+  --t-bar-divider:   rgba(255, 255, 255, 0.25);
+  --t-step-idle-fg:  rgba(255, 255, 255, 0.40);
+  --t-step-idle-dot: rgba(255, 255, 255, 0.20);
+  --t-step-active-fg: #FFB8AB;
+  --t-step-line:     linear-gradient(90deg, rgba(255,255,255,0.20), transparent);
+  --t-pill-bg:       rgba(255, 255, 255, 0.08);
+  --t-pill-border:   rgba(255, 255, 255, 0.14);
+  --t-pill-fg:       rgba(255, 255, 255, 0.85);
+  --t-pill-arrow:    rgba(255, 255, 255, 0.30);
+  --t-glow-display:  block;
+  --t-glow-opacity:  0.65;
+  --t-logo-light:    none;
+  --t-logo-dark:     block;
+}
+
+/* Themed page shell — drop on the outermost wrapper of the page. */
+.theme-shell[data-theme] {
+  background: var(--t-bg-overlay), var(--t-bg-base);
+  background-attachment: fixed;
+  color: var(--t-fg-1);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Brand glows — fixed to viewport. Hidden in light theme via tokens. */
+.theme-glow {
+  position: fixed;
+  display: var(--t-glow-display);
+  opacity: var(--t-glow-opacity);
+  width: 900px; height: 900px;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+.theme-glow.g1 { top: -300px; left: -240px;
+  background: url('/assets/glow-indigo.png') center/contain no-repeat; }
+.theme-glow.g2 { bottom: -340px; right: -260px;
+  background: url('/assets/glow-coral.png') center/contain no-repeat; }
+.theme-glow.g3 { top: 30%; right: -200px;
+  width: 560px; height: 560px;
+  opacity: calc(var(--t-glow-opacity) * 0.55);
+  background: url('/assets/glow-teal.png') center/contain no-repeat; }
+
+/* Logo swap — both <img>s in the DOM, the right one shows per theme. */
+.theme-logo-light { display: var(--t-logo-light); height: 30px; }
+.theme-logo-dark  { display: var(--t-logo-dark);  height: 30px; }
+
+/* Shared topbar chrome used by RoleHeader. */
+.themed-topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--t-bar-bg);
+  backdrop-filter: saturate(160%) blur(22px);
+  -webkit-backdrop-filter: saturate(160%) blur(22px);
+  border-bottom: var(--t-bar-border);
+}
+.themed-topbar .divider { color: var(--t-bar-divider); }
+.themed-topbar .crumb   { color: var(--t-fg-2); }
+.themed-topbar .crumb b { color: var(--t-accent-soft); font-weight: 500; }

@@ -25,10 +25,13 @@ export function RoleNavLinks({ items }: { items: NavItem[] }) {
             aria-current={active ? "page" : undefined}
             className={cn(
               "rounded-md px-s-3 py-s-1 text-[13px] transition-colors duration-fast",
-              active
-                ? "bg-indigo-soft text-indigo-deep"
-                : "text-fg-2 hover:bg-bg-sunken hover:text-fg-1",
+              active && "font-medium",
             )}
+            style={
+              active
+                ? { color: "var(--t-accent-soft)" }
+                : { color: "var(--t-fg-2)" }
+            }
           >
             {item.label}
           </Link>

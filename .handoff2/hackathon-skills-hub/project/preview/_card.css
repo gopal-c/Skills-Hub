@@ -1,0 +1,37 @@
+/* Preview card shell — minimal frame for Design System cards.
+   The asset name renders OUTSIDE the card, so cards themselves
+   show only the swatches/specimens. */
+@import url('../colors_and_type.css');
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg-surface);
+  color: var(--fg-1);
+  padding: 24px;
+}
+body.tight { padding: 20px; }
+body.dark {
+  background: var(--ink-900);
+  color: var(--fg-on-dark);
+}
+
+.row { display: flex; gap: 12px; align-items: stretch; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.label { font: var(--t-mono-s); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-2); }
+.sub  { font: var(--t-body-s); color: var(--fg-2); }
+.hex  { font: var(--t-mono-s); color: var(--fg-2); }
+
+.swatch {
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-hairline);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 88px;
+  color: var(--fg-on-dark);
+}
+.swatch .name { font: var(--t-label); }
+.swatch .val  { font: var(--t-mono-s); opacity: 0.85; margin-top: 2px; }
+.swatch.light { color: var(--fg-1); }

@@ -10,9 +10,9 @@ export default async function SearchPage() {
   const profiles = await getApprovedProfiles();
 
   return (
-    <main className="min-h-screen bg-bg-page">
+    <div data-theme="light" className="theme-shell">
       <RoleHeader session={session} eyebrow="HR · Search" />
-      <section className="mx-auto max-w-3xl px-s-8 py-s-12">
+      <section className="relative z-[1] mx-auto max-w-3xl px-s-8 py-s-12">
         <span className="eyebrow eyebrow-indigo">Search</span>
         <h1 className="mt-s-2">
           Find the right person, <span className="serif-italic" style={{ color: "var(--brand-indigo-deep)" }}>in plain English.</span>
@@ -26,6 +26,6 @@ export default async function SearchPage() {
           <SearchPanel approvedCount={profiles.length} />
         </div>
       </section>
-    </main>
+    </div>
   );
 }

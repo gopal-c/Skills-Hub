@@ -12,7 +12,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>
+      <body data-theme="light">
         {children}
         <Toaster position="bottom-right" richColors />
       </body>

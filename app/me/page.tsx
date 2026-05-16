@@ -13,10 +13,13 @@ export default async function MePage() {
   const profile = await getProfileByEmail(session.email);
 
   return (
-    <main className="min-h-screen bg-bg-page">
+    <div data-theme="dark" className="theme-shell">
+      <div className="theme-glow g1" aria-hidden />
+      <div className="theme-glow g2" aria-hidden />
+      <div className="theme-glow g3" aria-hidden />
       <RoleHeader session={session} eyebrow="My profile" />
 
-      <section className="mx-auto max-w-4xl px-s-8 py-s-10">
+      <section className="relative z-[1] mx-auto max-w-4xl px-s-8 py-s-10">
         {profile ? (
           <>
             <div className="mb-s-6 flex items-center gap-s-3 rounded-md border border-border-hairline bg-indigo-soft px-s-4 py-s-3 text-[13px] text-indigo-press">
@@ -29,7 +32,7 @@ export default async function MePage() {
           <EmptyProfileState />
         )}
       </section>
-    </main>
+    </div>
   );
 }
 

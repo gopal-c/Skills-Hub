@@ -20,9 +20,9 @@ export default async function ReviewProfilePage({ params }: { params: { id: stri
   if (!profile) notFound();
 
   return (
-    <main className="min-h-screen bg-bg-page">
+    <div data-theme="light" className="theme-shell">
       <RoleHeader session={session} eyebrow="HR · Review" />
-      <section className="mx-auto max-w-4xl px-s-8 py-s-10">
+      <section className="relative z-[1] mx-auto max-w-4xl px-s-8 py-s-10">
         <Link href="/review" className="text-[13px] text-fg-2 hover:text-fg-1">&larr; Back to queue</Link>
 
         <div className="mt-s-4 flex items-end justify-between gap-s-4">
@@ -40,6 +40,6 @@ export default async function ReviewProfilePage({ params }: { params: { id: stri
           <ProfileForm profile={profile} mode="review" />
         </div>
       </section>
-    </main>
+    </div>
   );
 }

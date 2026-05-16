@@ -1,0 +1,78 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { padding: 0; }
+  .stage {
+    height: 240px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(500px 320px at 10% -10%,  rgba(139,123,232,0.28), transparent 60%),
+      radial-gradient(420px 320px at 100% 30%, rgba(255,154,130,0.22), transparent 60%),
+      radial-gradient(420px 320px at 50% 110%, rgba(124,211,197,0.20), transparent 60%),
+      #FAFAFC;
+    padding: 24px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px;
+  }
+  .card {
+    flex: 1;
+    max-width: 240px;
+    padding: 18px;
+    border-radius: 18px;
+    background: linear-gradient(155deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.52) 60%, rgba(255,255,255,0.62) 100%);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 14px 32px -14px rgba(21,22,52,0.18), 0 2px 6px rgba(21,22,52,0.05);
+    position: relative;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.18) 100%);
+    pointer-events: none; mix-blend-mode: overlay;
+  }
+  .head { display:flex; align-items:center; gap:10px; }
+  .av {
+    width: 40px; height: 40px; border-radius: 50%;
+    color: #fff; font: 600 14px var(--font-sans);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(21,22,52,0.15), 0 0 0 3px rgba(255,255,255,0.55);
+    background: linear-gradient(135deg, #FF9A82, #FFCB6B);
+  }
+  .av.g2 { background: linear-gradient(135deg, #8B7BE8, #FF9A82); }
+  .nm  { font: 600 14px/1.2 var(--font-sans); color: var(--fg-1); }
+  .mt  { font: 11px/1 var(--font-sans); color: var(--fg-2); margin-top: 2px; }
+  .mt .lvl { color: var(--brand-indigo-deep); font-weight: 500; }
+  .skl { display:flex; gap: 4px; flex-wrap: wrap; }
+  .sk  {
+    font: var(--t-mono-s); padding: 3px 8px; border-radius: 6px;
+    background: rgba(244,244,248,0.7); border: 1px solid rgba(232,232,240,0.8);
+    color: var(--fg-1);
+  }
+</style></head>
+<body>
+  <div class="stage">
+    <div class="card">
+      <div class="head">
+        <div class="av">NR</div>
+        <div>
+          <div class="nm">Naveen Rao</div>
+          <div class="mt"><span class="lvl">junior</span> · Mumbai · 2 yrs</div>
+        </div>
+      </div>
+      <div class="skl"><span class="sk">Node.js</span><span class="sk">Express</span><span class="sk">MongoDB</span><span class="sk">+2</span></div>
+    </div>
+    <div class="card">
+      <div class="head">
+        <div class="av g2">RG</div>
+        <div>
+          <div class="nm">Riya Gupta</div>
+          <div class="mt"><span class="lvl">mid</span> · Bangalore · 4 yrs</div>
+        </div>
+      </div>
+      <div class="skl"><span class="sk">Next.js</span><span class="sk">TypeScript</span><span class="sk">tRPC</span><span class="sk">+2</span></div>
+    </div>
+  </div>
+</body></html>

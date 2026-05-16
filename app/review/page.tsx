@@ -13,9 +13,9 @@ export default async function ReviewQueuePage() {
   const pending = await getPendingProfiles();
 
   return (
-    <main className="min-h-screen bg-bg-page">
+    <div data-theme="light" className="theme-shell">
       <RoleHeader session={session} eyebrow="HR · Review queue" />
-      <section className="mx-auto max-w-5xl px-s-8 py-s-12">
+      <section className="relative z-[1] mx-auto max-w-5xl px-s-8 py-s-12">
         <span className="eyebrow eyebrow-coral">Review queue</span>
         <h1 className="mt-s-2">
           {pending.length} pending {pending.length === 1 ? "profile" : "profiles"}
@@ -77,6 +77,6 @@ export default async function ReviewQueuePage() {
           </ul>
         )}
       </section>
-    </main>
+    </div>
   );
 }

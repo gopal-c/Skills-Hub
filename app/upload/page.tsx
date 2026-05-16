@@ -6,9 +6,12 @@ export default async function UploadPage() {
   const session = await requireRole("employee");
 
   return (
-    <main className="min-h-screen bg-bg-page">
+    <div data-theme="dark" className="theme-shell">
+      <div className="theme-glow g1" aria-hidden />
+      <div className="theme-glow g2" aria-hidden />
+      <div className="theme-glow g3" aria-hidden />
       <RoleHeader session={session} eyebrow="Employee · Upload" />
-      <section className="mx-auto max-w-2xl px-s-8 py-s-12">
+      <section className="relative z-[1] mx-auto max-w-2xl px-s-8 py-s-12">
         <span className="eyebrow eyebrow-coral">Step 1</span>
         <h1 className="mt-s-2">
           Drop a resume. <span className="serif-italic" style={{ color: "var(--brand-coral-deep)" }}>We&rsquo;ll handle the rest.</span>
@@ -19,6 +22,6 @@ export default async function UploadPage() {
         </p>
         <UploadForm />
       </section>
-    </main>
+    </div>
   );
 }

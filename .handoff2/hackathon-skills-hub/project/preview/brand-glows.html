@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { padding: 0; }
+  .stage { background: var(--ink-900); padding: 20px; display:grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+  .cell { aspect-ratio: 1.4 / 1; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .cell img { width: 92%; height: 92%; object-fit: contain; mix-blend-mode: screen; }
+  .cell .nm { position:absolute; bottom:8px; left:10px; font:var(--t-mono-s); color: rgba(255,255,255,0.7); letter-spacing: 0.08em; text-transform: uppercase; }
+  .caption { background: var(--ink-900); color: rgba(255,255,255,0.7); padding: 6px 22px 20px; font: var(--t-body-s); }
+  .caption b { color:#fff; font-weight:500; }
+</style></head>
+<body>
+  <div class="stage">
+    <div class="cell"><img src="../assets/glow-indigo.png"><span class="nm">indigo</span></div>
+    <div class="cell"><img src="../assets/glow-coral.png"><span class="nm">coral</span></div>
+    <div class="cell"><img src="../assets/glow-teal.png"><span class="nm">teal</span></div>
+    <div class="cell"><img src="../assets/glow-amber.png"><span class="nm">amber</span></div>
+  </div>
+  <div class="caption"><b>Brand illustration</b> — soft radial glows over <code style="font:var(--t-mono-s);color:#B8B8D0">--ink-900</code>. Use 60–80% opacity with <code style="font:var(--t-mono-s);color:#B8B8D0">mix-blend-mode: screen</code>. Never more than two glows in one composition.</div>
+</body></html>
