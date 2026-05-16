@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { X, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,6 @@ function matches(p: Profile, q: string): boolean {
   if (p.city.toLowerCase().includes(ql))      return true;
   if (p.seniority.toLowerCase().includes(ql)) return true;
   if (p.skills.some((s) => s.name.toLowerCase().includes(ql))) return true;
-  if (p.projects.some((pr) => pr.skillsUsed.some((s) => s.toLowerCase().includes(ql)))) return true;
   return false;
 }
 
@@ -25,28 +25,30 @@ export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
 
   return (
     <div>
-      <div className="mt-s-6 flex items-center gap-s-3 rounded-xl border border-border-strong bg-bg-surface px-s-4 py-s-2 shadow-1 transition-all duration-base focus-within:border-border-focus focus-within:shadow-focus">
-        <span aria-hidden className="text-fg-3">⌕</span>
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter by name, skill, city, seniority…"
-          className="h-auto flex-1 border-0 bg-transparent px-0 text-[15px] shadow-none focus-visible:ring-0"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery("")}
-            className="rounded-md px-s-2 py-s-1 text-[12px] text-fg-2 hover:bg-bg-sunken"
-          >
-            Clear
-          </button>
-        )}
+      <div className="sticky top-0 z-10 -mx-s-8 mt-s-6 bg-bg-page/95 px-s-8 pb-s-3 pt-s-3 backdrop-blur">
+        <div className="flex items-center gap-s-3 rounded-xl border border-border-strong bg-bg-surface px-s-4 py-s-2 shadow-1 transition-all duration-base focus-within:border-border-focus focus-within:shadow-focus">
+          <Search className="size-4 flex-shrink-0 text-fg-3" aria-hidden />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Filter by name, skill, city, or role…"
+            className="h-auto flex-1 border-0 bg-transparent px-0 text-[15px] shadow-none focus-visible:ring-0"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Clear filter"
+              className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-pill text-fg-3 transition-colors hover:bg-bg-sunken hover:text-fg-1"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
+        <p className="mt-s-2 font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
+          Showing {filtered.length} of {profiles.length} {profiles.length === 1 ? "employee" : "employees"}
+        </p>
       </div>
-
-      <p className="mt-s-3 font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
-        {filtered.length} of {profiles.length} {profiles.length === 1 ? "person" : "people"}
-      </p>
 
       {filtered.length === 0 ? (
         <Card className="mt-s-6">
@@ -59,7 +61,7 @@ export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
           </CardContent>
         </Card>
       ) : (
-        <ul className="mt-s-6 grid gap-s-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-s-4 grid gap-s-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((p) => (
             <li key={p.id}>
               <Link href={`/employees/${p.id}`} className="block">
