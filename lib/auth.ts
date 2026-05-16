@@ -13,7 +13,7 @@ export const ROLES: Role[] = ["hr", "employee"];
 /** Where each role lands after login. */
 export const ROLE_HOME: Record<Role, string> = {
   hr:       "/search",
-  employee: "/upload",
+  employee: "/my-profile",
 };
 
 export function isValidRole(value: unknown): value is Role {
@@ -26,6 +26,7 @@ export const SESSION_COOKIE = "session";
 
 export type SessionPayload = {
   userId: string;
+  email: string;
   role: Role;
   name: string;
 };
@@ -39,7 +40,7 @@ function getSecret(): Uint8Array {
 }
 
 export async function signSession(payload: SessionPayload): Promise<string> {
-  return await new SignJWT({ role: payload.role, name: payload.name })
+  return await new SignJWT({ role: payload.role, name: payload.name, email: payload.email })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.userId)
     .setIssuedAt()
@@ -51,13 +52,15 @@ export async function verifySession(token: string | undefined | null): Promise<S
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret(), { algorithms: ["HS256"] });
-    const sub  = payload.sub;
-    const role = payload.role;
-    const name = payload.name;
-    if (typeof sub  !== "string") return null;
+    const sub   = payload.sub;
+    const role  = payload.role;
+    const name  = payload.name;
+    const email = payload.email;
+    if (typeof sub   !== "string") return null;
     if (role !== "hr" && role !== "employee") return null;
-    if (typeof name !== "string") return null;
-    return { userId: sub, role, name };
+    if (typeof name  !== "string") return null;
+    if (typeof email !== "string") return null;
+    return { userId: sub, email, role, name };
   } catch {
     return null;
   }

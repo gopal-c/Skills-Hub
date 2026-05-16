@@ -45,6 +45,7 @@ export async function POST(req: Request) {
 
   const token = await signSession({
     userId: user.id,
+    email:  user.email,
     role:   user.role,
     name:   user.name,
   });

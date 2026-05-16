@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, ROLE_HOME, verifySession, type Role } from "@/lib/auth";
 
 const HR_ONLY        = ["/search", "/review"];
-const EMPLOYEE_ONLY  = ["/upload"];
+const EMPLOYEE_ONLY  = ["/upload", "/my-profile"];
 const ANY_ROLE       = ["/employees", "/profile"];
 
 function pathMatches(pathname: string, prefixes: string[]): boolean {
@@ -46,6 +46,7 @@ export const config = {
     "/review/:path*",
     "/upload/:path*",
     "/profile/:path*",
+    "/my-profile/:path*",
     "/employees/:path*",
   ],
 };

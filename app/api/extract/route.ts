@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { extractText, getDocumentProxy } from "unpdf";
 import { addProfile, type Proficiency, type Seniority } from "@/lib/store";
+import { requireRole } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -92,6 +93,8 @@ function coerce(raw: unknown): Extracted | null {
 }
 
 export async function POST(req: Request) {
+  const session = await requireRole("employee");
+
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({ ok: false, error: "GROQ_API_KEY not configured." }, { status: 503 });
   }
@@ -149,7 +152,9 @@ export async function POST(req: Request) {
   }
 
   try {
-    const profile = await addProfile(extracted);
+    // Tag the profile with the authenticated user's account email so
+    // /my-profile can find it later, regardless of what's in the resume.
+    const profile = await addProfile({ ...extracted, email: session.email });
     return NextResponse.json({ ok: true, id: profile.id });
   } catch (err) {
     const message = err instanceof Error ? err.message : "save failed";
