@@ -50,6 +50,7 @@ export type Profile = {
   skills: Skill[];
   projects: Project[];
   education: Education[];
+  avatarUrl: string | null;
   status: Status;
   createdAt: string;
 };
@@ -92,6 +93,7 @@ type Row = {
   skills: Skill[] | null;
   projects: Project[] | null;
   education: Education[] | null;
+  avatar_url: string | null;
   created_at: string;
 };
 
@@ -107,6 +109,7 @@ function rowToProfile(r: Row): Profile {
     skills:    r.skills    ?? [],
     projects:  r.projects  ?? [],
     education: r.education ?? [],
+    avatarUrl: r.avatar_url ?? null,
     createdAt: r.created_at,
   };
 }
@@ -121,9 +124,12 @@ export async function createSchema(): Promise<void> {
       name TEXT, email TEXT, city TEXT, seniority TEXT,
       years_experience INT,
       skills JSONB, projects JSONB, education JSONB,
+      avatar_url TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  // Backfill for tables created before the avatar_url column existed.
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -176,7 +182,7 @@ export async function seedProfilesFromJson(): Promise<number> {
   if ((rows[0]?.c ?? 0) > 0) return 0;
 
   const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
-  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt">>;
+  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl">>;
   let inserted = 0;
   for (const e of seed) {
     const id = randomUUID();
@@ -285,7 +291,7 @@ export async function getPendingProfiles(): Promise<Profile[]> {
 }
 
 export async function addProfile(
-  input: Omit<Profile, "id" | "status" | "createdAt">,
+  input: Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl">,
 ): Promise<Profile> {
   const id = randomUUID();
   const { rows } = await sql<Row>`
