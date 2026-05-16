@@ -10,18 +10,38 @@ export default async function UploadPage() {
       <div className="theme-glow g1" aria-hidden />
       <div className="theme-glow g2" aria-hidden />
       <div className="theme-glow g3" aria-hidden />
+
       <RoleHeader session={session} eyebrow="Employee · Upload" />
-      <section className="relative z-[1] mx-auto max-w-2xl px-s-8 py-s-12">
-        <span className="eyebrow eyebrow-coral">Step 1</span>
-        <h1 className="mt-s-2">
-          Drop a resume. <span className="serif-italic" style={{ color: "var(--brand-coral-deep)" }}>We&rsquo;ll handle the rest.</span>
+
+      <main className="upload-v2 relative z-[1] mx-auto max-w-[820px] px-s-8 pb-s-20 pt-s-16">
+        <div className="steps">
+          <span className="step active"><span className="dot" />Step 1 · Upload</span>
+          <span className="step-line" />
+          <span className="step"><span className="dot" />Step 2 · Extract</span>
+          <span className="step-line" />
+          <span className="step"><span className="dot" />Step 3 · Review</span>
+        </div>
+
+        <h1 className="page-title">
+          Drop a resume. <em>We&rsquo;ll handle the rest.</em>
         </h1>
-        <p className="mt-s-3 max-w-xl text-[15px] text-fg-2">
-          We&rsquo;ll extract your skills, projects, and proficiency.
-          A reviewer takes a quick look before your profile goes live.
+        <p className="page-sub">
+          We&rsquo;ll extract your skills, projects, and proficiency. A reviewer takes a
+          quick look before your profile goes live.
         </p>
+
         <UploadForm />
-      </section>
+
+        <div className="next-trail">
+          <b>What happens next</b>
+          <span className="arrow">→</span>
+          <span className="pill">AI extracts skills, projects, proficiency</span>
+          <span className="arrow">→</span>
+          <span className="pill">HR reviews your profile</span>
+          <span className="arrow">→</span>
+          <span className="pill">You&rsquo;re searchable</span>
+        </div>
+      </main>
     </div>
   );
 }

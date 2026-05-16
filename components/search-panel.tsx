@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import Link from "next/link";
+import { Search } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SearchResultCard } from "@/components/search-result-card";
+import { avatarPalette, initials } from "@/lib/avatar-gradient";
 import type { Profile } from "@/lib/store";
 
 const EXAMPLE_QUERIES = [
@@ -63,139 +62,170 @@ export function SearchPanel({ approvedCount }: { approvedCount: number }) {
 
   return (
     <div>
-      {/* Search input */}
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          runSearch(query);
-        }}
-        className="flex items-center gap-s-3 rounded-xl border border-border-strong bg-bg-surface p-s-2 pl-s-4 shadow-1 transition-all duration-base focus-within:border-border-focus focus-within:shadow-focus"
+        onSubmit={(e) => { e.preventDefault(); runSearch(query); }}
+        className="qbar"
       >
-        <span aria-hidden className="text-fg-3">⌕</span>
-        <Input
+        <Search className="ic size-5" />
+        <input
           ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ask in plain English — who knows X and has shipped Y?"
-          className="h-auto flex-1 border-0 bg-transparent px-0 text-[16px] shadow-none focus-visible:ring-0"
           disabled={isPending}
         />
-        <Button type="submit" disabled={isPending || !query.trim()} className="h-11 rounded-lg px-s-5">
+        <button type="submit" className="go" disabled={isPending || !query.trim()}>
           {isPending ? "Searching…" : "Search →"}
-        </Button>
+        </button>
       </form>
 
-      {/* Example queries */}
       {state.kind === "idle" && (
-        <div className="mt-s-4 flex flex-wrap items-center gap-s-2">
-          <span className="font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
-            Try
-          </span>
-          {EXAMPLE_QUERIES.map((q) => (
-            <button
-              key={q}
-              type="button"
-              onClick={() => applyExample(q)}
-              className="rounded-pill border border-border-hairline bg-bg-surface px-s-3 py-s-1 text-[13px] text-fg-1 transition-colors duration-fast hover:border-indigo hover:text-indigo-deep"
-            >
-              {q}
-            </button>
-          ))}
+        <>
+          <div className="suggested">
+            <span className="lbl">Try</span>
+            {EXAMPLE_QUERIES.map((q) => (
+              <button key={q} type="button" className="chip" onClick={() => applyExample(q)}>
+                {q}
+              </button>
+            ))}
+          </div>
+          <div className="empty">
+            <div className="ey">Ready</div>
+            <h3>Ask your <em>first question.</em></h3>
+            <p>
+              {approvedCount} approved {approvedCount === 1 ? "profile" : "profiles"} indexed.
+              Each result comes with a one-line reason you can trust.
+            </p>
+          </div>
+        </>
+      )}
+
+      {state.kind === "loading" && (
+        <div>
+          <div className="results-meta">
+            <span className="count">Asking the model…</span>
+          </div>
+          <div className="results">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="result-card">
+                <div className="result-head">
+                  <Skeleton className="size-[52px] rounded-full" />
+                  <div className="flex-1 space-y-s-2">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-1/4" />
+                  </div>
+                  <Skeleton className="h-9 w-24 rounded-md" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-md" />
+                <div className="flex gap-s-1">
+                  <Skeleton className="h-5 w-16 rounded-pill" />
+                  <Skeleton className="h-5 w-20 rounded-pill" />
+                  <Skeleton className="h-5 w-14 rounded-pill" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Results / empty / loading */}
-      <div className="mt-s-8">
-        {state.kind === "idle" && (
-          <Card>
-            <CardContent className="py-s-10 text-center">
-              <p className="font-mono text-[11px] uppercase tracking-eyebrow text-fg-3">Ready</p>
-              <h3 className="mt-s-2">
-                Ask your <span className="serif-italic text-indigo-deep">first question.</span>
-              </h3>
-              <p className="mt-s-2 text-[14px] text-fg-2">
-                {approvedCount} approved {approvedCount === 1 ? "profile" : "profiles"} indexed.
-                Each result comes with a one-line reason you can trust.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+      {state.kind === "error" && (
+        <div className="empty" style={{ borderColor: "rgba(255,154,130,0.35)" }}>
+          <div className="ey" style={{ color: "var(--brand-coral-deep)" }}>Error</div>
+          <h3>Something broke.</h3>
+          <p>{state.error}</p>
+          <button
+            type="button"
+            onClick={() => runSearch(state.query)}
+            className="chip"
+            style={{ marginTop: 16 }}
+          >
+            Try again
+          </button>
+        </div>
+      )}
 
-        {state.kind === "loading" && (
-          <div>
-            <p className="mb-s-4 font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
-              Asking the model…
-            </p>
-            <ul className="space-y-s-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <li key={i}>
-                  <div className="rounded-lg border border-border-hairline bg-bg-surface p-s-5 shadow-1">
-                    <div className="flex items-center gap-s-3">
-                      <Skeleton className="h-10 w-10 rounded-pill" />
-                      <div className="flex-1 space-y-s-2">
-                        <Skeleton className="h-4 w-1/3" />
-                        <Skeleton className="h-3 w-1/4" />
-                      </div>
-                      <Skeleton className="h-7 w-20" />
-                    </div>
-                    <Skeleton className="mt-s-3 h-12 w-full" />
-                    <div className="mt-s-3 flex gap-s-1">
-                      <Skeleton className="h-5 w-16" />
-                      <Skeleton className="h-5 w-20" />
-                      <Skeleton className="h-5 w-14" />
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+      {state.kind === "results" && state.results.length === 0 && (
+        <div className="empty">
+          <div className="ey">No matches</div>
+          <h3>Nobody matches yet. <em>Try fewer constraints?</em></h3>
+          <p>You asked: <span className="serif-italic">&ldquo;{state.query}&rdquo;</span></p>
+        </div>
+      )}
+
+      {state.kind === "results" && state.results.length > 0 && (
+        <div>
+          <div className="results-meta">
+            <span className="count">
+              <b>{state.results.length}</b> {state.results.length === 1 ? "match" : "matches"}
+            </span>
+            <span className="sort">ranked by relevance</span>
           </div>
-        )}
-
-        {state.kind === "error" && (
-          <Card>
-            <CardContent className="py-s-8 text-center">
-              <p className="font-mono text-[11px] uppercase tracking-eyebrow text-coral-deep">Error</p>
-              <h3 className="mt-s-2">Something broke.</h3>
-              <p className="mt-s-2 text-[14px] text-fg-2">{state.error}</p>
-              <Button type="button" variant="outline" className="mt-s-4" onClick={() => runSearch(state.query)}>
-                Try again
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {state.kind === "results" && state.results.length === 0 && (
-          <Card>
-            <CardContent className="py-s-10 text-center">
-              <p className="font-mono text-[11px] uppercase tracking-eyebrow text-fg-3">No matches</p>
-              <h3 className="mt-s-2">Nobody matches yet. Try fewer constraints?</h3>
-              <p className="mt-s-2 text-[14px] text-fg-2">
-                You asked: <span className="serif-italic">&ldquo;{state.query}&rdquo;</span>
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {state.kind === "results" && state.results.length > 0 && (
-          <div>
-            <div className="mb-s-4 flex items-baseline justify-between">
-              <p className="font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
-                {state.results.length} {state.results.length === 1 ? "match" : "matches"}
-              </p>
-              <p className="text-[12px] text-fg-3">
-                ranked by relevance
-              </p>
-            </div>
-            <ul className="space-y-s-3">
-              {state.results.map((r) => (
-                <li key={r.profile.id}>
-                  <SearchResultCard profile={r.profile} score={r.score} reason={r.reason} />
-                </li>
-              ))}
-            </ul>
+          <div className="results">
+            {state.results.map((r) => (
+              <SearchResultCard key={r.profile.id} profile={r.profile} score={r.score} reason={r.reason} />
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function SearchResultCard({ profile, score, reason }: Result) {
+  const palette = avatarPalette(profile.name);
+  const strong  = score >= 70;
+  const reasonLower = reason.toLowerCase();
+  const shownSkills = profile.skills.slice(0, 8);
+
+  return (
+    <Link
+      href={`/employees/${profile.id}`}
+      className="result-card"
+    >
+      <div className="result-head">
+        <div className="result-avatar-wrap" style={{ "--halo": palette.halo } as React.CSSProperties}>
+          {profile.avatarUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={profile.avatarUrl} alt={profile.name} className="result-avatar" />
+          ) : (
+            <div
+              className="result-avatar"
+              style={{ background: `linear-gradient(135deg, ${palette.grad[0]}, ${palette.grad[1]})` }}
+            >
+              {initials(profile.name)}
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="result-name">{profile.name}</div>
+          <div className="result-meta">
+            <span className="lvl">{profile.seniority}</span> · {profile.city} · {profile.yearsExperience} yrs
+          </div>
+        </div>
+        <span className={`score ${strong ? "" : "warm"}`}>
+          <b>{score}</b>
+          <span> / 100</span>
+        </span>
+      </div>
+
+      <div className="reason">
+        <b>Why</b>
+        {reason}
+      </div>
+
+      {shownSkills.length > 0 && (
+        <div className="result-skills">
+          {shownSkills.map((s) => {
+            const matched = reasonLower.includes(s.name.toLowerCase());
+            return (
+              <span key={s.name} className={`result-skill ${matched ? "match" : ""}`}>{s.name}</span>
+            );
+          })}
+          {profile.skills.length > shownSkills.length && (
+            <span className="result-skill">+{profile.skills.length - shownSkills.length}</span>
+          )}
+        </div>
+      )}
+    </Link>
   );
 }

@@ -1,30 +1,40 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Upload as UploadIcon, FileText, X } from "lucide-react";
 
 export function UploadForm() {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!file) {
-      toast.error("Pick a PDF first.");
-      return;
-    }
-    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+  function pickFile(f: File | null) {
+    if (!f) return;
+    if (f.type !== "application/pdf" && !f.name.toLowerCase().endsWith(".pdf")) {
       toast.error("That doesn't look like a PDF.");
       return;
     }
+    setFile(f);
+  }
 
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    pickFile(e.dataTransfer.files?.[0] ?? null);
+  }
+
+  function clearFile() {
+    setFile(null);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!file) return;
     startTransition(async () => {
       const fd = new FormData();
       fd.append("file", file);
@@ -44,53 +54,71 @@ export function UploadForm() {
     });
   }
 
-  if (isPending) {
-    return (
-      <Card className="mt-s-8">
-        <CardHeader>
-          <CardTitle>Reading your resume…</CardTitle>
-          <CardDescription>Extracting skills, projects, and proficiency. Usually 5–15 seconds.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-s-3">
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-4 w-1/3" />
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="mt-s-8">
-      <CardHeader>
-        <CardTitle>Upload a resume</CardTitle>
-        <CardDescription>PDF only, please. We&rsquo;ll handle the rest.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-s-5">
-          <div className="space-y-s-2">
-            <Label htmlFor="resume">Resume PDF</Label>
-            <Input
-              id="resume"
-              type="file"
-              accept="application/pdf,.pdf"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              required
-            />
-            {file && (
-              <p className="text-[12px] text-fg-2">
-                <span className="font-mono">{file.name}</span> · {(file.size / 1024).toFixed(0)} KB
-              </p>
-            )}
-          </div>
+    <section className="form-card">
+      <h2>Upload a resume</h2>
+      <p className="lede">PDF only, please. We&rsquo;ll handle the rest.</p>
 
-          <Button type="submit" disabled={!file} className="h-11 rounded-lg text-[14px]">
-            Extract &amp; submit for review &rarr;
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      <label className="field-label">Resume PDF</label>
+
+      <form onSubmit={handleSubmit}>
+        <label
+          className={`dropzone ${dragging ? "dragging" : ""}`}
+          onDragEnter={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+            disabled={isPending}
+          />
+          <span className="dz-icon">
+            <UploadIcon />
+          </span>
+          <div className="dz-title">
+            Drag &amp; drop your resume, or <b>click to choose</b>
+          </div>
+          <div className="dz-hint">A clean PDF works best. We support up to 10 MB.</div>
+          <div className="dz-meta">
+            <span>PDF only</span><span className="pip"></span>
+            <span>10 MB max</span><span className="pip"></span>
+            <span>Single file</span>
+          </div>
+        </label>
+
+        {file && (
+          <div className="file-row">
+            <span className="file-icon">
+              <FileText className="size-[18px]" />
+            </span>
+            <div>
+              <div className="file-name">{file.name}</div>
+              <div className="file-meta">
+                {(file.size / (1024 * 1024)).toFixed(2)} MB · {isPending ? "Extracting…" : "Ready to extract"}
+              </div>
+            </div>
+            <button
+              type="button"
+              className="file-clear"
+              onClick={clearFile}
+              aria-label="Remove file"
+              disabled={isPending}
+            >
+              <X className="size-[14px]" />
+            </button>
+          </div>
+        )}
+
+        <div className="form-actions">
+          <button type="submit" className="btn-primary" disabled={!file || isPending}>
+            {isPending ? "Extracting…" : "Extract & submit for review →"}
+          </button>
+        </div>
+      </form>
+    </section>
   );
 }

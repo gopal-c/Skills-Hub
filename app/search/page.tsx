@@ -12,20 +12,18 @@ export default async function SearchPage() {
   return (
     <div data-theme="light" className="theme-shell">
       <RoleHeader session={session} eyebrow="HR · Search" />
-      <section className="relative z-[1] mx-auto max-w-3xl px-s-8 py-s-12">
-        <span className="eyebrow eyebrow-indigo">Search</span>
-        <h1 className="mt-s-2">
-          Find the right person, <span className="serif-italic" style={{ color: "var(--brand-indigo-deep)" }}>in plain English.</span>
+      <main className="search-v2 relative z-[1] mx-auto max-w-[820px] px-s-8 pb-s-20 pt-s-16">
+        <div className="eyebrow eyebrow-indigo">Search</div>
+        <h1 className="page-title">
+          Find the right person, <em>in plain English.</em>
         </h1>
-        <p className="mt-s-3 max-w-xl text-[15px] text-fg-2">
-          Ask a question the way you&rsquo;d ask a teammate. We&rsquo;ll rank candidates
-          and tell you why each one matched.
+        <p className="page-sub">
+          Ask a question the way you&rsquo;d ask a teammate. We&rsquo;ll rank candidates and
+          tell you why each one matched.
         </p>
 
-        <div className="mt-s-8">
-          <SearchPanel approvedCount={profiles.length} />
-        </div>
-      </section>
+        <SearchPanel approvedCount={profiles.length} />
+      </main>
     </div>
   );
 }
