@@ -264,14 +264,14 @@
   --t-logo-dark:     block;
 }
 
-/* Themed page shell — drop on the outermost wrapper of the page. */
+/* Themed page shell — drop on the outermost wrapper of the page.
+   No overflow rules — they'd break position:sticky on the topbar. The
+   glows are position:fixed so they don't trigger horizontal scroll. */
 .theme-shell[data-theme] {
   background: var(--t-bg-overlay), var(--t-bg-base);
   background-attachment: fixed;
   color: var(--t-fg-1);
   min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
 }
 
 /* Brand glows — fixed to viewport. Hidden in light theme via tokens. */
