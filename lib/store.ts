@@ -161,28 +161,60 @@ export async function createUserForProfile(
   return (rowCount ?? 0) > 0;
 }
 
-/**
- * Seed the users table:
- *  - The two static demo accounts (HR + generic Employee)
- *  - One employee account per profile in seed/employees.json (email + Demo@123)
- * Idempotent — uses ON CONFLICT (email) DO NOTHING.
- */
-export async function seedUsers(): Promise<number> {
+/** Insert the two static demo accounts (HR + generic Employee). Idempotent. */
+export async function seedDemoUsers(): Promise<number> {
   let inserted = 0;
-
-  // Static demo accounts (HR + generic employee).
   for (const u of DEMO_USERS) {
     if (await createUserForProfile(u.email, u.name, u.role, u.password)) inserted++;
   }
+  return inserted;
+}
 
-  // One account per seeded employee profile so every example email is loginable.
+/** Seed the 15 example profiles from seed/employees.json if the table is empty. */
+export async function seedProfilesFromJson(): Promise<number> {
+  const { rows } = await sql<{ c: number }>`SELECT COUNT(*)::int AS c FROM profiles`;
+  if ((rows[0]?.c ?? 0) > 0) return 0;
+
   const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
-  const profiles = JSON.parse(raw) as Array<{ email: string; name: string }>;
-  for (const p of profiles) {
+  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt">>;
+  let inserted = 0;
+  for (const e of seed) {
+    const id = randomUUID();
+    await sql`
+      INSERT INTO profiles (id, status, name, email, city, seniority, years_experience, skills, projects, education)
+      VALUES (
+        ${id}, 'approved', ${e.name}, ${e.email}, ${e.city}, ${e.seniority}, ${e.yearsExperience},
+        ${JSON.stringify(e.skills)}::jsonb,
+        ${JSON.stringify(e.projects)}::jsonb,
+        ${JSON.stringify(e.education)}::jsonb
+      )
+    `;
+    inserted++;
+  }
+  return inserted;
+}
+
+/**
+ * Backfill the users table from existing profiles. For each profile row with
+ * an email, insert a user account (role=employee, password=Demo@123). Idempotent
+ * — existing emails are skipped via ON CONFLICT (email) DO NOTHING.
+ */
+export async function backfillUsersFromProfiles(): Promise<number> {
+  const { rows } = await sql<{ email: string; name: string }>`
+    SELECT email, name FROM profiles WHERE email IS NOT NULL AND email <> ''
+  `;
+  let inserted = 0;
+  for (const p of rows) {
     if (await createUserForProfile(p.email, p.name, "employee", DEMO_PASSWORD)) inserted++;
   }
-
   return inserted;
+}
+
+/** @deprecated — kept for backward compat; equivalent to demos + backfill. */
+export async function seedUsers(): Promise<number> {
+  const a = await seedDemoUsers();
+  const b = await backfillUsersFromProfiles();
+  return a + b;
 }
 
 export async function getUserByEmail(email: string): Promise<(User & { passwordHash: string }) | undefined> {
@@ -201,27 +233,12 @@ let bootstrapPromise: Promise<void> | null = null;
 async function ensureSeeded(): Promise<void> {
   if (bootstrapPromise) return bootstrapPromise;
   bootstrapPromise = (async () => {
-    // Idempotent — creates the tables on the first read if /api/init was skipped.
+    // Idempotent — creates tables, seeds demos + profiles, then backfills
+    // a user account for every profile email.
     await createSchema();
-    await seedUsers();
-
-    const { rows } = await sql<{ c: number }>`SELECT COUNT(*)::int AS c FROM profiles`;
-    if ((rows[0]?.c ?? 0) > 0) return;
-
-    const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
-    const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt">>;
-    for (const e of seed) {
-      const id = randomUUID();
-      await sql`
-        INSERT INTO profiles (id, status, name, email, city, seniority, years_experience, skills, projects, education)
-        VALUES (
-          ${id}, 'approved', ${e.name}, ${e.email}, ${e.city}, ${e.seniority}, ${e.yearsExperience},
-          ${JSON.stringify(e.skills)}::jsonb,
-          ${JSON.stringify(e.projects)}::jsonb,
-          ${JSON.stringify(e.education)}::jsonb
-        )
-      `;
-    }
+    await seedDemoUsers();
+    await seedProfilesFromJson();
+    await backfillUsersFromProfiles();
   })().catch((err) => {
     bootstrapPromise = null;
     throw err;
