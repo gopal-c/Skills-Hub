@@ -141,18 +141,47 @@ const DEMO_USERS: Array<{ email: string; name: string; role: Role; password: str
   { email: "employee@demo.com", name: "Employee Demo", role: "employee", password: "Demo@123" },
 ];
 
+const DEMO_PASSWORD = "Demo@123";
+
+/** Insert a single user account if one with that email doesn't exist. */
+export async function createUserForProfile(
+  email: string,
+  name: string,
+  role: Role = "employee",
+  password: string = DEMO_PASSWORD,
+): Promise<boolean> {
+  if (!email || !name) return false;
+  const hash = await bcrypt.hash(password, 10);
+  const id = randomUUID();
+  const { rowCount } = await sql`
+    INSERT INTO users (id, email, password_hash, name, role)
+    VALUES (${id}, ${email.toLowerCase()}, ${hash}, ${name}, ${role})
+    ON CONFLICT (email) DO NOTHING
+  `;
+  return (rowCount ?? 0) > 0;
+}
+
+/**
+ * Seed the users table:
+ *  - The two static demo accounts (HR + generic Employee)
+ *  - One employee account per profile in seed/employees.json (email + Demo@123)
+ * Idempotent — uses ON CONFLICT (email) DO NOTHING.
+ */
 export async function seedUsers(): Promise<number> {
   let inserted = 0;
+
+  // Static demo accounts (HR + generic employee).
   for (const u of DEMO_USERS) {
-    const hash = await bcrypt.hash(u.password, 10);
-    const id = randomUUID();
-    const { rowCount } = await sql`
-      INSERT INTO users (id, email, password_hash, name, role)
-      VALUES (${id}, ${u.email}, ${hash}, ${u.name}, ${u.role})
-      ON CONFLICT (email) DO NOTHING
-    `;
-    if ((rowCount ?? 0) > 0) inserted++;
+    if (await createUserForProfile(u.email, u.name, u.role, u.password)) inserted++;
   }
+
+  // One account per seeded employee profile so every example email is loginable.
+  const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
+  const profiles = JSON.parse(raw) as Array<{ email: string; name: string }>;
+  for (const p of profiles) {
+    if (await createUserForProfile(p.email, p.name, "employee", DEMO_PASSWORD)) inserted++;
+  }
+
   return inserted;
 }
 

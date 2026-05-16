@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { extractText, getDocumentProxy } from "unpdf";
-import { addProfile, type Proficiency, type Seniority } from "@/lib/store";
+import { addProfile, createUserForProfile, type Proficiency, type Seniority } from "@/lib/store";
 import { requireRole } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -93,7 +93,7 @@ function coerce(raw: unknown): Extracted | null {
 }
 
 export async function POST(req: Request) {
-  const session = await requireRole("employee");
+  await requireRole("employee");
 
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({ ok: false, error: "GROQ_API_KEY not configured." }, { status: 503 });
@@ -152,9 +152,12 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Tag the profile with the authenticated user's account email so
-    // /my-profile can find it later, regardless of what's in the resume.
-    const profile = await addProfile({ ...extracted, email: session.email });
+    const profile = await addProfile(extracted);
+    // Best-effort: create a login for the resume's email (Demo@123).
+    // Existing accounts are no-ops via ON CONFLICT DO NOTHING.
+    if (extracted.email) {
+      await createUserForProfile(extracted.email, extracted.name, "employee").catch(() => {});
+    }
     return NextResponse.json({ ok: true, id: profile.id });
   } catch (err) {
     const message = err instanceof Error ? err.message : "save failed";
