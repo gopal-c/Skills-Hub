@@ -97,11 +97,14 @@ export async function createSchema(): Promise<void> {
 
 /* ─────────── Lazy seed on first read ─────────── */
 
-let seedingPromise: Promise<void> | null = null;
+let bootstrapPromise: Promise<void> | null = null;
 
 async function ensureSeeded(): Promise<void> {
-  if (seedingPromise) return seedingPromise;
-  seedingPromise = (async () => {
+  if (bootstrapPromise) return bootstrapPromise;
+  bootstrapPromise = (async () => {
+    // Idempotent — creates the table on the first read if /api/init was skipped.
+    await createSchema();
+
     const { rows } = await sql<{ c: number }>`SELECT COUNT(*)::int AS c FROM profiles`;
     if ((rows[0]?.c ?? 0) > 0) return;
 
@@ -120,10 +123,10 @@ async function ensureSeeded(): Promise<void> {
       `;
     }
   })().catch((err) => {
-    seedingPromise = null;
+    bootstrapPromise = null;
     throw err;
   });
-  return seedingPromise;
+  return bootstrapPromise;
 }
 
 /* ─────────── Public API ─────────── */
