@@ -1,39 +1,39 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySession, ROLE_HOME, type Role } from "@/lib/auth";
+import { ROLE_COOKIE, ROLE_HOME, isValidRole, type Role } from "@/lib/auth";
 
-const HR_PATHS       = ["/search", "/review"];
-const EMPLOYEE_PATHS = ["/upload", "/profile"];
+const HR_ONLY        = ["/search", "/review"];
+const EMPLOYEE_ONLY  = ["/upload"];
+const ANY_ROLE       = ["/employees", "/profile"];
 
-function pathMatchesPrefix(pathname: string, prefixes: string[]): boolean {
+function pathMatches(pathname: string, prefixes: string[]): boolean {
   return prefixes.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
-function pathRequiresRole(pathname: string): Role | null {
-  if (pathMatchesPrefix(pathname, HR_PATHS))       return "hr";
-  if (pathMatchesPrefix(pathname, EMPLOYEE_PATHS)) return "employee";
+function requiredFor(pathname: string): Role | "any" | null {
+  if (pathMatches(pathname, HR_ONLY))       return "hr";
+  if (pathMatches(pathname, EMPLOYEE_ONLY)) return "employee";
+  if (pathMatches(pathname, ANY_ROLE))      return "any";
   return null;
 }
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const required = pathRequiresRole(pathname);
+export function middleware(req: NextRequest) {
+  const required = requiredFor(req.nextUrl.pathname);
   if (!required) return NextResponse.next();
 
-  const token   = req.cookies.get(SESSION_COOKIE)?.value;
-  const session = await verifySession(token);
+  const cookie = req.cookies.get(ROLE_COOKIE)?.value;
+  const role   = isValidRole(cookie) ? cookie : null;
 
-  if (!session) {
+  if (!role) {
     const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("next", pathname);
+    url.pathname = "/";
+    url.search   = "";
     return NextResponse.redirect(url);
   }
 
-  if (session.role !== required) {
-    // Logged in as the wrong role — send them to their own home.
+  if (required !== "any" && role !== required) {
     const url = req.nextUrl.clone();
-    url.pathname = ROLE_HOME[session.role];
-    url.search = "";
+    url.pathname = ROLE_HOME[role];
+    url.search   = "";
     return NextResponse.redirect(url);
   }
 
@@ -41,5 +41,11 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/search/:path*", "/review/:path*", "/upload/:path*", "/profile/:path*"],
+  matcher: [
+    "/search/:path*",
+    "/review/:path*",
+    "/upload/:path*",
+    "/profile/:path*",
+    "/employees/:path*",
+  ],
 };

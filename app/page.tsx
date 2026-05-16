@@ -1,11 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { enterAs } from "@/app/actions/role";
 
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-bg-dark text-fg-on-dark">
-      {/* Brand glows — soft radial, screen-blended, two max per the design system */}
       <Image
         src="/assets/glow-indigo.png"
         alt=""
@@ -22,61 +21,90 @@ export default function Home() {
         width={640}
         height={640}
         priority
-        className="pointer-events-none absolute -bottom-32 -right-24 h-[640px] w-[640px] opacity-50 mix-blend-screen"
+        className="pointer-events-none absolute -bottom-40 -right-32 h-[640px] w-[640px] opacity-50 mix-blend-screen"
       />
 
-      {/* Top bar */}
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-s-8 py-s-6">
-        <Image
-          src="/assets/logo-wordmark-dark.svg"
-          alt="SkillsHub"
-          width={160}
-          height={36}
-          priority
-        />
-        <nav className="hidden gap-s-6 text-fg-on-dark-2 md:flex">
-          <Link href="/preview" className="text-[13px] hover:text-fg-on-dark">
-            Design tokens
-          </Link>
-        </nav>
+        <Image src="/assets/logo-wordmark-dark.svg" alt="SkillsHub" width={160} height={36} priority />
+        <Link href="/preview" className="text-[13px] text-fg-on-dark-2 hover:text-fg-on-dark">
+          Design tokens
+        </Link>
       </header>
 
-      {/* Hero — one focal point per screen */}
-      <section className="relative z-10 mx-auto flex max-w-3xl flex-col items-start gap-s-6 px-s-8 pb-s-20 pt-s-16">
-        <span className="eyebrow eyebrow-indigo" style={{ color: "var(--brand-indigo)" }}>
-          01 · Skills intelligence
+      <section className="relative z-10 mx-auto flex max-w-3xl flex-col items-start px-s-8 pb-s-12 pt-s-16">
+        <span className="eyebrow" style={{ color: "var(--brand-indigo)" }}>
+          00 · Skills intelligence
         </span>
-
-        <h1 className="display-l text-fg-on-dark">
-          Find the right person.
-          <br />
-          <span className="serif-italic" style={{ color: "var(--brand-indigo)" }}>
-            In plain English.
-          </span>
+        <h1 className="mt-s-3 text-fg-on-dark">
+          Two ways in. <span className="serif-italic" style={{ color: "var(--brand-indigo)" }}>Pick yours.</span>
         </h1>
-
-        <p className="max-w-xl text-[18px] leading-[1.55] text-fg-on-dark-2">
-          Ask a question the way you&rsquo;d ask a teammate. SkillsHub reads every
-          resume, learns what your people can do, and surfaces ranked matches
-          &mdash; each with a reason you can trust.
-        </p>
-
-        <div className="mt-s-4 flex flex-wrap items-center gap-s-3">
-          <Button size="lg" className="h-11 px-s-5 rounded-lg text-[14px]">
-            Get started
-          </Button>
-          <Link
-            href="/preview"
-            className="rounded-md px-s-4 py-s-3 text-[14px] text-fg-on-dark-2 transition-colors hover:text-fg-on-dark"
-          >
-            See the design system &rarr;
-          </Link>
-        </div>
-
-        <p className="mt-s-8 font-mono text-[11px] uppercase tracking-eyebrow text-ink-500">
-          {"// hackathon · SkillsHub"}
+        <p className="mt-s-4 max-w-xl text-[18px] leading-[1.55] text-fg-on-dark-2">
+          Search the directory in plain English &mdash; or drop a resume and let us
+          extract your skills.
         </p>
       </section>
+
+      <section className="relative z-10 mx-auto grid max-w-3xl gap-s-4 px-s-8 pb-s-20 md:grid-cols-2">
+        {/* HR card */}
+        <form action={enterAs.bind(null, "hr")}>
+          <button
+            type="submit"
+            className="group relative flex h-full w-full flex-col items-start gap-s-4 overflow-hidden rounded-xl bg-bg-surface p-s-6 text-left shadow-3 transition-all duration-base ease-out hover:-translate-y-px hover:shadow-4"
+          >
+            <Image
+              src="/assets/glow-indigo.png"
+              alt=""
+              aria-hidden
+              width={280}
+              height={280}
+              className="pointer-events-none absolute -right-16 -top-16 h-[280px] w-[280px] opacity-35"
+            />
+            <span className="eyebrow eyebrow-indigo relative">HR · Hiring</span>
+            <h3 className="relative text-fg-1">
+              Find the right person, <span className="serif-italic" style={{ color: "var(--brand-indigo-deep)" }}>fast.</span>
+            </h3>
+            <p className="relative text-[14px] text-fg-2">
+              Ask in plain English. Get ranked matches with a reason for each.
+            </p>
+            <span className="relative mt-auto inline-flex items-center gap-s-2 text-[13px] font-medium text-indigo-deep transition-transform duration-base group-hover:translate-x-1">
+              Enter as HR &rarr;
+            </span>
+          </button>
+        </form>
+
+        {/* Employee card */}
+        <form action={enterAs.bind(null, "employee")}>
+          <button
+            type="submit"
+            className="group relative flex h-full w-full flex-col items-start gap-s-4 overflow-hidden rounded-xl bg-bg-surface p-s-6 text-left shadow-3 transition-all duration-base ease-out hover:-translate-y-px hover:shadow-4"
+          >
+            <Image
+              src="/assets/glow-coral.png"
+              alt=""
+              aria-hidden
+              width={280}
+              height={280}
+              className="pointer-events-none absolute -right-16 -top-16 h-[280px] w-[280px] opacity-35"
+            />
+            <span className="eyebrow eyebrow-coral relative">Employee</span>
+            <h3 className="relative text-fg-1">
+              Show what you can do, <span className="serif-italic" style={{ color: "var(--brand-coral-deep)" }}>in seconds.</span>
+            </h3>
+            <p className="relative text-[14px] text-fg-2">
+              Drop a resume. We&rsquo;ll extract your skills, projects, and proficiency.
+            </p>
+            <span className="relative mt-auto inline-flex items-center gap-s-2 text-[13px] font-medium text-coral-deep transition-transform duration-base group-hover:translate-x-1">
+              Enter as Employee &rarr;
+            </span>
+          </button>
+        </form>
+      </section>
+
+      <footer className="relative z-10 mx-auto max-w-6xl px-s-8 pb-s-8">
+        <p className="font-mono text-[11px] uppercase tracking-eyebrow text-ink-500">
+          {"// hackathon · SkillsHub"}
+        </p>
+      </footer>
     </main>
   );
 }
