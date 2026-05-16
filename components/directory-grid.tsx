@@ -2,11 +2,9 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { X, Search } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { ProfileAvatar } from "@/components/profile-avatar";
+import { Search, X } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { avatarPalette, initials } from "@/lib/avatar-gradient";
 import type { Profile } from "@/lib/store";
 
 function matches(p: Profile, q: string): boolean {
@@ -19,39 +17,43 @@ function matches(p: Profile, q: string): boolean {
   return false;
 }
 
+function empId(i: number): string {
+  return `SH-25${String(i + 1).padStart(3, "0")}`;
+}
+
 export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => profiles.filter((p) => matches(p, query.trim())), [profiles, query]);
 
   return (
     <div>
-      <div className="sticky top-0 z-10 -mx-s-8 mt-s-6 bg-bg-page/95 px-s-8 pb-s-3 pt-s-3 backdrop-blur">
-        <div className="flex items-center gap-s-3 rounded-xl border border-border-strong bg-bg-surface px-s-4 py-s-2 shadow-1 transition-all duration-base focus-within:border-border-focus focus-within:shadow-focus">
-          <Search className="size-4 flex-shrink-0 text-fg-3" aria-hidden />
-          <Input
+      <div className="toolbar">
+        <div className="search">
+          <Search className="icon size-4" />
+          <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Filter by name, skill, city, or role…"
-            className="h-auto flex-1 border-0 bg-transparent px-0 text-[15px] shadow-none focus-visible:ring-0"
+            placeholder="Find anyone — name, skill, location, or role…"
           />
           {query && (
             <button
               type="button"
+              className="clear-btn"
               onClick={() => setQuery("")}
               aria-label="Clear filter"
-              className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-pill text-fg-3 transition-colors hover:bg-bg-sunken hover:text-fg-1"
             >
-              <X className="size-4" />
+              <X className="size-3.5" />
             </button>
           )}
         </div>
-        <p className="mt-s-2 font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
-          Showing {filtered.length} of {profiles.length} {profiles.length === 1 ? "employee" : "employees"}
-        </p>
       </div>
 
+      <p className="count-strip">
+        Showing {filtered.length} of {profiles.length} {profiles.length === 1 ? "employee" : "employees"}
+      </p>
+
       {filtered.length === 0 ? (
-        <Card className="mt-s-6">
+        <Card>
           <CardContent className="py-s-10 text-center">
             <p className="font-mono text-[11px] uppercase tracking-eyebrow text-fg-3">No matches</p>
             <h3 className="mt-s-2">Nobody matches yet. Try fewer constraints?</h3>
@@ -61,41 +63,52 @@ export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
           </CardContent>
         </Card>
       ) : (
-        <ul className="mt-s-4 grid gap-s-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => (
-            <li key={p.id}>
-              <Link href={`/employees/${p.id}`} className="block">
-                <Card className="h-full transition-all duration-base ease-out hover:-translate-y-px hover:shadow-2">
-                  <CardHeader>
-                    <div className="flex items-center gap-s-3">
-                      <ProfileAvatar name={p.name} avatarUrl={p.avatarUrl} className="size-10 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="truncate text-[17px]">{p.name}</CardTitle>
-                        <p className="text-[13px] text-fg-2">
-                          {p.seniority} &middot; {p.city} &middot; {p.yearsExperience} yrs
-                        </p>
-                      </div>
+        <div className="grid">
+          {filtered.map((p, i) => {
+            const palette = avatarPalette(p.name);
+            const visibleSkills = p.skills.slice(0, 3);
+            const more = p.skills.length - visibleSkills.length;
+            return (
+              <Link
+                href={`/employees/${p.id}`}
+                key={p.id}
+                className="id-card"
+                style={{ "--halo": palette.halo } as React.CSSProperties}
+              >
+                <div className="id-avatar-wrap">
+                  {p.avatarUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={p.avatarUrl} alt={p.name} className="id-avatar" />
+                  ) : (
+                    <div
+                      className="id-avatar"
+                      style={{ background: `linear-gradient(135deg, ${palette.grad[0]}, ${palette.grad[1]})` }}
+                    >
+                      {initials(p.name)}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-s-1">
-                      {p.skills.slice(0, 5).map((s) => (
-                        <Badge key={s.name} variant="secondary" className="font-mono text-[11px]">
-                          {s.name}
-                        </Badge>
-                      ))}
-                      {p.skills.length > 5 && (
-                        <Badge variant="outline" className="font-mono text-[11px]">
-                          +{p.skills.length - 5}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                  )}
+                  <span className="id-status" title="Approved" />
+                </div>
+
+                <div className="id-name">{p.name}</div>
+                <span className={`level-pill ${p.seniority}`}>{p.seniority}</span>
+                <div className="id-loc">{p.city}</div>
+
+                <div className="id-skills">
+                  {visibleSkills.map((s) => (
+                    <span key={s.name} className="id-skill">{s.name}</span>
+                  ))}
+                  {more > 0 && <span className="id-skill more">+{more}</span>}
+                </div>
+
+                <div className="id-row">
+                  <span>{empId(i)}</span>
+                  <span className="yrs">{p.yearsExperience} yrs</span>
+                </div>
               </Link>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       )}
     </div>
   );

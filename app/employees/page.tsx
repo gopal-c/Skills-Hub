@@ -9,8 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function EmployeesDirectoryPage() {
   const session = await requireRole("any");
   const profiles = await getApprovedProfiles();
-
-  const theme = session.role === "hr" ? "light" : "dark";
+  const theme    = session.role === "hr" ? "light" : "dark";
 
   return (
     <div data-theme={theme} className="theme-shell">
@@ -22,14 +21,14 @@ export default async function EmployeesDirectoryPage() {
         </>
       )}
       <RoleHeader session={session} eyebrow="Directory" />
-      <section className="relative z-[1] mx-auto max-w-6xl px-s-8 py-s-12">
-        <span className="eyebrow">Directory</span>
-        <h1 className="mt-s-2">
+
+      <main className="directory-v2 relative z-[1] mx-auto max-w-[1240px] px-s-8 pb-s-16 pt-s-12">
+        <div className="eyebrow">Directory</div>
+        <h1 className="page-title">
           {profiles.length} {profiles.length === 1 ? "person" : "people"}
         </h1>
-        <p className="mt-s-3 max-w-xl text-[15px] text-fg-2">
-          Approved profiles, ready to be searched. Filter by name, skill, city,
-          or seniority &mdash; or open one to see the full picture.
+        <p className="page-sub">
+          Approved profiles, ready to be searched. Click any card to see the full picture.
         </p>
 
         {profiles.length === 0 ? (
@@ -47,7 +46,7 @@ export default async function EmployeesDirectoryPage() {
         ) : (
           <DirectoryGrid profiles={profiles} />
         )}
-      </section>
+      </main>
     </div>
   );
 }

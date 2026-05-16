@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteProfileButton } from "@/components/delete-profile-button";
-import { ProfileAvatar } from "@/components/profile-avatar";
 import { EditableAvatar } from "@/components/editable-avatar";
+import { avatarPalette, initials } from "@/lib/avatar-gradient";
 import type { Profile, Skill } from "@/lib/store";
 
 const CATEGORY_ORDER = ["language", "framework", "database", "cloud", "tool", "domain", "soft"];
@@ -35,15 +33,6 @@ function groupByCategory(skills: Skill[]): Array<[string, Skill[]]> {
   return sortedKeys.map((k) => [k, buckets.get(k)!]);
 }
 
-function proficiencyClass(p: string): string {
-  switch (p) {
-    case "expert":       return "bg-coral-soft text-coral-press border-transparent";
-    case "advanced":     return "bg-indigo-soft text-indigo-press border-transparent";
-    case "intermediate": return "bg-bg-sunken text-fg-1 border-transparent";
-    default:             return "border-border-strong text-fg-2 bg-transparent";
-  }
-}
-
 export function ProfileView({
   profile,
   canManage,
@@ -54,31 +43,46 @@ export function ProfileView({
   editableAvatar?: boolean;
 }) {
   const grouped = groupByCategory(profile.skills);
+  const palette = avatarPalette(profile.name);
+  const heroStyle = { "--halo": palette.halo } as React.CSSProperties;
+  const isPending = profile.status === "pending";
 
   return (
-    <>
-      <header className="flex flex-wrap items-end justify-between gap-s-4 border-b border-border-hairline pb-s-6">
-        <div className="flex items-start gap-s-4">
+    <div className="profile-v2">
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-avatar-wrap" style={heroStyle}>
           {editableAvatar ? (
-            <EditableAvatar profile={profile} className="size-16 flex-shrink-0" />
+            <EditableAvatar profile={profile} className="size-32 hero-avatar" />
+          ) : profile.avatarUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={profile.avatarUrl} alt={profile.name} className="hero-avatar" />
           ) : (
-            <ProfileAvatar name={profile.name} avatarUrl={profile.avatarUrl} className="size-16 flex-shrink-0" />
+            <div
+              className="hero-avatar"
+              style={{ background: `linear-gradient(135deg, ${palette.grad[0]}, ${palette.grad[1]})` }}
+            >
+              {initials(profile.name)}
+            </div>
           )}
-          <div>
-            <span className="eyebrow eyebrow-indigo">{profile.seniority}</span>
-            <h1 className="mt-s-2">{profile.name}</h1>
-            <p className="mt-s-2 text-[14px] text-fg-2">
-              <span className="font-mono">{profile.email}</span>
-              <span className="mx-s-2 text-fg-3">·</span>
-              {profile.city}
-              <span className="mx-s-2 text-fg-3">·</span>
-              {profile.yearsExperience} yrs experience
-            </p>
+          <span className={`hero-status-dot ${isPending ? "pending" : ""}`} />
+        </div>
+
+        <div className="identity">
+          <div className="ey">{profile.seniority}</div>
+          <h1 className="name">{profile.name}</h1>
+          <div className="meta">
+            <span>{profile.email}</span>
+            <span className="sep">·</span>
+            <span>{profile.city}</span>
+            <span className="sep">·</span>
+            <span>{profile.yearsExperience} yrs experience</span>
+            {isPending && <span className="pending-pill">Pending review</span>}
           </div>
         </div>
 
         {canManage && (
-          <div className="flex items-center gap-s-2">
+          <div className="actions">
             <Link
               href={`/review/${profile.id}`}
               className={buttonVariants({ variant: "outline", size: "sm" })}
@@ -88,96 +92,83 @@ export function ProfileView({
             <DeleteProfileButton id={profile.id} name={profile.name} />
           </div>
         )}
-      </header>
+      </section>
 
-      {/* Skills */}
-      <section className="mt-s-8">
-        <span className="eyebrow">Skills</span>
-        <h2 className="mt-s-2">{profile.skills.length} {profile.skills.length === 1 ? "skill" : "skills"}</h2>
+      {/* SKILLS */}
+      <section className="section">
+        <div className="ey">Skills</div>
+        <div className="count">{profile.skills.length} {profile.skills.length === 1 ? "skill" : "skills"}</div>
 
         {profile.skills.length === 0 ? (
-          <p className="mt-s-4 text-[14px] text-fg-2">No skills on record.</p>
+          <p className="text-[14px] text-fg-2">No skills on record.</p>
         ) : (
-          <div className="mt-s-6 space-y-s-6">
-            {grouped.map(([cat, items]) => (
-              <div key={cat}>
-                <p className="font-mono text-[11px] uppercase tracking-eyebrow text-fg-2">
-                  {CATEGORY_LABEL[cat] ?? cat}
-                </p>
-                <ul className="mt-s-3 flex flex-wrap gap-s-2">
-                  {items.map((s) => (
-                    <li
-                      key={s.name}
-                      className="flex items-center gap-s-2 rounded-pill border border-border-hairline bg-bg-surface px-s-3 py-s-1"
-                    >
-                      <span className="text-[13px] font-medium text-fg-1">{s.name}</span>
-                      <Badge className={`rounded-pill px-s-2 py-0 font-mono text-[10px] uppercase ${proficiencyClass(s.proficiency)}`}>
-                        {s.proficiency}
-                      </Badge>
-                      <span className="font-mono text-[11px] text-fg-3">{s.yearsExperience} yr</span>
-                    </li>
-                  ))}
-                </ul>
+          grouped.map(([cat, items]) => (
+            <div key={cat}>
+              <div className="cat">{CATEGORY_LABEL[cat] ?? cat}</div>
+              <div className="skill-row">
+                {items.map((s) => (
+                  <span key={s.name} className="skill-pill">
+                    {s.name}
+                    <span className={`lvl ${s.proficiency}`}>{s.proficiency}</span>
+                    <span className="yrs">{s.yearsExperience} yr</span>
+                  </span>
+                ))}
               </div>
+            </div>
+          ))
+        )}
+      </section>
+
+      {/* PROJECTS */}
+      <section className="section">
+        <div className="ey">Projects</div>
+        <div className="count">{profile.projects.length} {profile.projects.length === 1 ? "project" : "projects"}</div>
+
+        {profile.projects.length === 0 ? (
+          <p className="text-[14px] text-fg-2">No projects on record.</p>
+        ) : (
+          <div className="projects">
+            {profile.projects.map((p, i) => (
+              <article key={i} className="project-card">
+                <div className="head">
+                  <h3 className="title">{p.name}</h3>
+                  <span className="when">{p.duration}</span>
+                </div>
+                <p className="desc">{p.description}</p>
+                {p.skillsUsed.length > 0 && (
+                  <div className="tags">
+                    {p.skillsUsed.map((s) => (
+                      <span key={s} className="tag">{s}</span>
+                    ))}
+                  </div>
+                )}
+              </article>
             ))}
           </div>
         )}
       </section>
 
-      {/* Projects */}
-      <section className="mt-s-12">
-        <span className="eyebrow">Projects</span>
-        <h2 className="mt-s-2">{profile.projects.length} {profile.projects.length === 1 ? "project" : "projects"}</h2>
-
-        {profile.projects.length === 0 ? (
-          <p className="mt-s-4 text-[14px] text-fg-2">No projects on record.</p>
-        ) : (
-          <ul className="mt-s-6 space-y-s-4">
-            {profile.projects.map((p, i) => (
-              <li key={i}>
-                <Card>
-                  <CardHeader className="flex flex-row items-baseline justify-between gap-s-3">
-                    <CardTitle className="text-[17px]">{p.name}</CardTitle>
-                    <span className="font-mono text-[11px] text-fg-2">{p.duration}</span>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-[14px] leading-[1.55] text-fg-1">{p.description}</p>
-                    {p.skillsUsed.length > 0 && (
-                      <div className="mt-s-3 flex flex-wrap gap-s-1">
-                        {p.skillsUsed.map((s) => (
-                          <Badge key={s} variant="secondary" className="font-mono text-[11px]">{s}</Badge>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Education */}
-      <section className="mt-s-12">
-        <span className="eyebrow">Education</span>
-        <h2 className="mt-s-2">{profile.education.length} {profile.education.length === 1 ? "entry" : "entries"}</h2>
+      {/* EDUCATION */}
+      <section className="section">
+        <div className="ey">Education</div>
+        <div className="count">{profile.education.length} {profile.education.length === 1 ? "entry" : "entries"}</div>
 
         {profile.education.length === 0 ? (
-          <p className="mt-s-4 text-[14px] text-fg-2">No education on record.</p>
+          <p className="text-[14px] text-fg-2">No education on record.</p>
         ) : (
-          <ul className="mt-s-6 space-y-s-2">
+          <div className="education">
             {profile.education.map((e, i) => (
-              <li key={i} className="flex items-baseline justify-between border-b border-border-hairline pb-s-3 last:border-0">
-                <div>
-                  <p className="text-[15px] font-medium text-fg-1">{e.degree}</p>
-                  <p className="text-[13px] text-fg-2">{e.institution}</p>
+              <article key={i} className="edu-card">
+                <div className="edu-body">
+                  <div className="school">{e.degree}</div>
+                  <div className="place">{e.institution}</div>
                 </div>
-                <span className="font-mono text-[12px] text-fg-2">{e.year}</span>
-              </li>
+                <span className="year">{e.year}</span>
+              </article>
             ))}
-          </ul>
+          </div>
         )}
       </section>
-    </>
+    </div>
   );
 }
