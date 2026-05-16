@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteProfileButton } from "@/components/delete-profile-button";
+import { ProfileAvatar } from "@/components/profile-avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -62,16 +63,19 @@ export default async function EmployeeProfilePage({ params }: { params: { id: st
         <Link href="/employees" className="text-[13px] text-fg-2 hover:text-fg-1">&larr; Back to directory</Link>
 
         <header className="mt-s-4 flex flex-wrap items-end justify-between gap-s-4 border-b border-border-hairline pb-s-6">
-          <div>
-            <span className="eyebrow eyebrow-indigo">{profile.seniority}</span>
-            <h1 className="mt-s-2">{profile.name}</h1>
-            <p className="mt-s-2 text-[14px] text-fg-2">
-              <span className="font-mono">{profile.email}</span>
-              <span className="mx-s-2 text-fg-3">·</span>
-              {profile.city}
-              <span className="mx-s-2 text-fg-3">·</span>
-              {profile.yearsExperience} yrs experience
-            </p>
+          <div className="flex items-center gap-s-4">
+            <ProfileAvatar name={profile.name} email={profile.email} className="size-16 flex-shrink-0" />
+            <div>
+              <span className="eyebrow eyebrow-indigo">{profile.seniority}</span>
+              <h1 className="mt-s-2">{profile.name}</h1>
+              <p className="mt-s-2 text-[14px] text-fg-2">
+                <span className="font-mono">{profile.email}</span>
+                <span className="mx-s-2 text-fg-3">·</span>
+                {profile.city}
+                <span className="mx-s-2 text-fg-3">·</span>
+                {profile.yearsExperience} yrs experience
+              </p>
+            </div>
           </div>
 
           {session.role === "hr" && (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import type { Profile } from "@/lib/store";
 
 type Props = {
@@ -6,23 +7,6 @@ type Props = {
   score: number;
   reason: string;
 };
-
-const AVATAR_GRADIENTS = [
-  "linear-gradient(135deg, var(--brand-coral),  var(--brand-amber))",
-  "linear-gradient(135deg, var(--brand-indigo), var(--brand-teal))",
-  "linear-gradient(135deg, var(--brand-teal),   var(--brand-amber))",
-  "linear-gradient(135deg, var(--brand-indigo), var(--brand-coral))",
-];
-
-function avatarBg(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
-  return AVATAR_GRADIENTS[hash % AVATAR_GRADIENTS.length];
-}
-
-function initial(name: string): string {
-  return name.trim().charAt(0).toUpperCase() || "?";
-}
 
 export function SearchResultCard({ profile, score, reason }: Props) {
   const strong = score >= 70;
@@ -38,13 +22,7 @@ export function SearchResultCard({ profile, score, reason }: Props) {
     >
       {/* Head */}
       <div className="flex items-center gap-s-3">
-        <span
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-pill font-medium text-white"
-          style={{ background: avatarBg(profile.name) }}
-          aria-hidden
-        >
-          {initial(profile.name)}
-        </span>
+        <ProfileAvatar name={profile.name} email={profile.email} className="size-10 flex-shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[17px] font-semibold text-fg-1">{profile.name}</p>
           <p className="text-[13px] text-fg-2">

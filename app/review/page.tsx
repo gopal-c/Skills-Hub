@@ -4,6 +4,7 @@ import { RoleHeader } from "@/components/role-header";
 import { getPendingProfiles } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ProfileAvatar } from "@/components/profile-avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -41,12 +42,21 @@ export default async function ReviewQueuePage() {
                 <Link href={`/review/${p.id}`} className="block">
                   <Card className="transition-all duration-base ease-out hover:-translate-y-px hover:shadow-2">
                     <CardHeader>
-                      <CardTitle className="text-[17px]">{p.name || "Unnamed candidate"}</CardTitle>
+                      <div className="flex items-center gap-s-3">
+                        <ProfileAvatar
+                          name={p.name || "?"}
+                          email={p.email}
+                          className="size-10 flex-shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="truncate text-[17px]">{p.name || "Unnamed candidate"}</CardTitle>
+                          <p className="text-[13px] text-fg-2">
+                            {p.seniority} &middot; {p.city || "—"} &middot; {p.yearsExperience} yrs
+                          </p>
+                        </div>
+                      </div>
                     </CardHeader>
                     <CardContent className="space-y-s-3">
-                      <p className="text-[13px] text-fg-2">
-                        {p.seniority} &middot; {p.city || "—"} &middot; {p.yearsExperience} yrs
-                      </p>
                       <div className="flex flex-wrap gap-s-1">
                         {p.skills.slice(0, 4).map((s) => (
                           <Badge key={s.name} variant="secondary" className="font-mono text-[11px]">

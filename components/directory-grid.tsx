@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { ProfileAvatar } from "@/components/profile-avatar";
 import type { Profile } from "@/lib/store";
 
 function matches(p: Profile, q: string): boolean {
@@ -64,10 +65,15 @@ export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
               <Link href={`/employees/${p.id}`} className="block">
                 <Card className="h-full transition-all duration-base ease-out hover:-translate-y-px hover:shadow-2">
                   <CardHeader>
-                    <CardTitle className="text-[17px]">{p.name}</CardTitle>
-                    <p className="text-[13px] text-fg-2">
-                      {p.seniority} &middot; {p.city} &middot; {p.yearsExperience} yrs
-                    </p>
+                    <div className="flex items-center gap-s-3">
+                      <ProfileAvatar name={p.name} email={p.email} className="size-10 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="truncate text-[17px]">{p.name}</CardTitle>
+                        <p className="text-[13px] text-fg-2">
+                          {p.seniority} &middot; {p.city} &middot; {p.yearsExperience} yrs
+                        </p>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-s-1">
