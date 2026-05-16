@@ -1,14 +1,16 @@
 /**
- * In-memory profile store.
+ * SQL-backed profile store (Vercel Postgres on Neon).
  *
- * Loaded once on module init from seed/employees.json with all profiles
- * marked `approved`. Lives only in-process — restarts clear non-seeded
- * additions. Fine for hackathon scope.
+ * Reads `POSTGRES_URL` from env automatically. Table is created via
+ * `/api/init` (hit once manually). On first read after init, the
+ * profiles table is auto-seeded from seed/employees.json with all
+ * entries marked `approved`.
  */
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
+import { sql } from "@vercel/postgres";
 
 export type Proficiency = "beginner" | "intermediate" | "advanced" | "expert";
 export type Seniority   = "junior" | "mid" | "senior" | "lead";
@@ -48,57 +50,167 @@ export type Profile = {
   createdAt: string;
 };
 
-type SeedProfile = Omit<Profile, "id" | "status" | "createdAt">;
+type Row = {
+  id: string;
+  status: Status;
+  name: string;
+  email: string;
+  city: string;
+  seniority: Seniority;
+  years_experience: number;
+  skills: Skill[] | null;
+  projects: Project[] | null;
+  education: Education[] | null;
+  created_at: string;
+};
 
-function loadSeed(): Profile[] {
-  const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
-  const seed: SeedProfile[] = JSON.parse(raw);
-  const now = new Date().toISOString();
-  return seed.map((p) => ({
-    ...p,
-    id: randomUUID(),
-    status: "approved" as const,
-    createdAt: now,
-  }));
-}
-
-// Module-level mutable array. Re-loaded on cold start (dev HMR + serverless).
-const profiles: Profile[] = loadSeed();
-
-export function getProfiles(): Profile[] {
-  return profiles;
-}
-
-export function getProfile(id: string): Profile | undefined {
-  return profiles.find((p) => p.id === id);
-}
-
-export function getApprovedProfiles(): Profile[] {
-  return profiles.filter((p) => p.status === "approved");
-}
-
-export function getPendingProfiles(): Profile[] {
-  return profiles.filter((p) => p.status === "pending");
-}
-
-export function addProfile(input: Omit<Profile, "id" | "status" | "createdAt">): Profile {
-  const profile: Profile = {
-    ...input,
-    id: randomUUID(),
-    status: "pending",
-    createdAt: new Date().toISOString(),
+function rowToProfile(r: Row): Profile {
+  return {
+    id: r.id,
+    status: r.status,
+    name: r.name,
+    email: r.email,
+    city: r.city,
+    seniority: r.seniority,
+    yearsExperience: r.years_experience,
+    skills:    r.skills    ?? [],
+    projects:  r.projects  ?? [],
+    education: r.education ?? [],
+    createdAt: r.created_at,
   };
-  profiles.push(profile);
-  return profile;
 }
 
-export function updateProfile(id: string, patch: Partial<Omit<Profile, "id">>): Profile | undefined {
-  const idx = profiles.findIndex((p) => p.id === id);
-  if (idx === -1) return undefined;
-  profiles[idx] = { ...profiles[idx], ...patch };
-  return profiles[idx];
+/* ─────────── DDL (called by /api/init) ─────────── */
+
+export async function createSchema(): Promise<void> {
+  await sql`
+    CREATE TABLE IF NOT EXISTS profiles (
+      id TEXT PRIMARY KEY,
+      status TEXT NOT NULL DEFAULT 'pending',
+      name TEXT, email TEXT, city TEXT, seniority TEXT,
+      years_experience INT,
+      skills JSONB, projects JSONB, education JSONB,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
 }
 
-export function setProfileStatus(id: string, status: Status): Profile | undefined {
-  return updateProfile(id, { status });
+/* ─────────── Lazy seed on first read ─────────── */
+
+let seedingPromise: Promise<void> | null = null;
+
+async function ensureSeeded(): Promise<void> {
+  if (seedingPromise) return seedingPromise;
+  seedingPromise = (async () => {
+    const { rows } = await sql<{ c: number }>`SELECT COUNT(*)::int AS c FROM profiles`;
+    if ((rows[0]?.c ?? 0) > 0) return;
+
+    const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
+    const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt">>;
+    for (const e of seed) {
+      const id = randomUUID();
+      await sql`
+        INSERT INTO profiles (id, status, name, email, city, seniority, years_experience, skills, projects, education)
+        VALUES (
+          ${id}, 'approved', ${e.name}, ${e.email}, ${e.city}, ${e.seniority}, ${e.yearsExperience},
+          ${JSON.stringify(e.skills)}::jsonb,
+          ${JSON.stringify(e.projects)}::jsonb,
+          ${JSON.stringify(e.education)}::jsonb
+        )
+      `;
+    }
+  })().catch((err) => {
+    seedingPromise = null;
+    throw err;
+  });
+  return seedingPromise;
+}
+
+/* ─────────── Public API ─────────── */
+
+export async function getProfiles(): Promise<Profile[]> {
+  await ensureSeeded();
+  const { rows } = await sql<Row>`SELECT * FROM profiles ORDER BY created_at DESC`;
+  return rows.map(rowToProfile);
+}
+
+export async function getProfile(id: string): Promise<Profile | undefined> {
+  await ensureSeeded();
+  const { rows } = await sql<Row>`SELECT * FROM profiles WHERE id = ${id} LIMIT 1`;
+  return rows[0] ? rowToProfile(rows[0]) : undefined;
+}
+
+export async function getApprovedProfiles(): Promise<Profile[]> {
+  await ensureSeeded();
+  const { rows } = await sql<Row>`
+    SELECT * FROM profiles WHERE status = 'approved' ORDER BY created_at DESC
+  `;
+  return rows.map(rowToProfile);
+}
+
+export async function getPendingProfiles(): Promise<Profile[]> {
+  await ensureSeeded();
+  const { rows } = await sql<Row>`
+    SELECT * FROM profiles WHERE status = 'pending' ORDER BY created_at DESC
+  `;
+  return rows.map(rowToProfile);
+}
+
+export async function addProfile(
+  input: Omit<Profile, "id" | "status" | "createdAt">,
+): Promise<Profile> {
+  const id = randomUUID();
+  const { rows } = await sql<Row>`
+    INSERT INTO profiles (id, status, name, email, city, seniority, years_experience, skills, projects, education)
+    VALUES (
+      ${id}, 'pending', ${input.name}, ${input.email}, ${input.city}, ${input.seniority}, ${input.yearsExperience},
+      ${JSON.stringify(input.skills)}::jsonb,
+      ${JSON.stringify(input.projects)}::jsonb,
+      ${JSON.stringify(input.education)}::jsonb
+    )
+    RETURNING *
+  `;
+  return rowToProfile(rows[0]);
+}
+
+export async function updateProfile(
+  id: string,
+  patch: Partial<Omit<Profile, "id" | "createdAt">>,
+): Promise<Profile | undefined> {
+  // Hand-built dynamic update — small enough to stay readable.
+  const sets: string[] = [];
+  const values: unknown[] = [];
+  const map: Record<string, string> = {
+    name: "name", email: "email", city: "city", seniority: "seniority",
+    yearsExperience: "years_experience", status: "status",
+    skills: "skills", projects: "projects", education: "education",
+  };
+  for (const [k, v] of Object.entries(patch)) {
+    if (!(k in map) || v === undefined) continue;
+    const col = map[k];
+    values.push(["skills", "projects", "education"].includes(k) ? JSON.stringify(v) : v);
+    sets.push(`${col} = $${values.length}${["skills","projects","education"].includes(k) ? "::jsonb" : ""}`);
+  }
+  if (sets.length === 0) return getProfile(id);
+  values.push(id);
+  const { rows } = await sql.query<Row>(
+    `UPDATE profiles SET ${sets.join(", ")} WHERE id = $${values.length} RETURNING *`,
+    values,
+  );
+  return rows[0] ? rowToProfile(rows[0]) : undefined;
+}
+
+export async function setProfileStatus(
+  id: string,
+  status: Status,
+): Promise<Profile | undefined> {
+  const { rows } = await sql<Row>`
+    UPDATE profiles SET status = ${status} WHERE id = ${id} RETURNING *
+  `;
+  return rows[0] ? rowToProfile(rows[0]) : undefined;
+}
+
+export async function deleteProfile(id: string): Promise<boolean> {
+  const { rowCount } = await sql`DELETE FROM profiles WHERE id = ${id}`;
+  return (rowCount ?? 0) > 0;
 }

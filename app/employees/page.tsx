@@ -2,9 +2,11 @@ import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
 import { getApprovedProfiles } from "@/lib/store";
 
-export default function EmployeesDirectoryPage() {
+export const dynamic = "force-dynamic";
+
+export default async function EmployeesDirectoryPage() {
   const role = requireRole("any");
-  const profiles = getApprovedProfiles();
+  const profiles = await getApprovedProfiles();
 
   return (
     <main className="min-h-screen bg-bg-page">
