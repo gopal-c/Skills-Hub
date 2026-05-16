@@ -758,6 +758,28 @@
 }
 .profile-v2 .edu-body { flex: 1; min-width: 0; }
 
+/* Responsive: shrink the profile hero on phones so it doesn't overflow. */
+@media (max-width: 640px) {
+  .profile-v2 .hero {
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .profile-v2 .hero-avatar { width: 88px; height: 88px; font-size: 30px; }
+  .profile-v2 .identity .name { font: 600 30px/1.1 var(--font-sans); letter-spacing: -0.015em; margin: 4px 0 8px; }
+  .profile-v2 .identity .meta { font: var(--t-body-s); }
+  .profile-v2 .actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .profile-v2 .actions > * { flex: 1; justify-content: center; }
+  .profile-v2 .section .count {
+    font: 600 26px/1.2 var(--font-sans);
+    margin-bottom: 18px;
+  }
+}
+
 /* ════════════════════════════════════════════════════════════
    SEARCH-V2 — frosted query bar + result cards.
    ════════════════════════════════════════════════════════════ */
@@ -807,12 +829,14 @@
 }
 .search-v2 .qbar .ic { color: var(--ink-400); flex-shrink: 0; }
 .search-v2 .qbar input {
-  flex: 1; border: none; outline: none; background: transparent;
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
   font: var(--t-body-l); color: var(--ink-800);
   padding: 12px 4px;
 }
 .search-v2 .qbar input::placeholder { color: var(--ink-400); }
 .search-v2 .qbar .go {
+  flex-shrink: 0;
   background: var(--brand-indigo-deep); color: #fff;
   border: none; border-radius: 999px;
   padding: 0 22px; height: 44px;
@@ -826,6 +850,13 @@
 .search-v2 .qbar .go:hover:not(:disabled) { background: var(--brand-indigo-press); }
 .search-v2 .qbar .go:active { transform: scale(0.97); }
 .search-v2 .qbar .go:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Compact pill button on narrow screens so the search bar doesn't overflow. */
+@media (max-width: 640px) {
+  .search-v2 .qbar { padding: 6px 6px 6px 14px; gap: 6px; }
+  .search-v2 .qbar .go { padding: 0 14px; height: 40px; }
+  .search-v2 .qbar .go .go-label { display: none; }
+}
 
 .search-v2 .suggested {
   display: flex; gap: 8px; flex-wrap: wrap; align-items: center;

@@ -75,7 +75,8 @@ export function SearchPanel({ approvedCount }: { approvedCount: number }) {
           disabled={isPending}
         />
         <button type="submit" className="go" disabled={isPending || !query.trim()}>
-          {isPending ? "Searching…" : "Search →"}
+          <span className="go-label">{isPending ? "Searching" : "Search"}</span>
+          <span aria-hidden>{isPending ? "…" : "→"}</span>
         </button>
       </form>
 

@@ -55,11 +55,16 @@ export function MobileMenu({
           id="role-mobile-menu"
           className="absolute left-0 right-0 top-full z-20 md:hidden"
           style={{
-            background: "var(--t-bar-bg)",
-            borderBottom: "var(--t-bar-border)",
-            backdropFilter: "saturate(160%) blur(22px)",
-            WebkitBackdropFilter: "saturate(160%) blur(22px)",
-          }}
+            background: "#FFFFFF",
+            color: "var(--ink-800)",
+            borderBottom: "1px solid rgba(232, 232, 240, 0.9)",
+            boxShadow: "0 12px 30px -14px rgba(21, 22, 52, 0.18)",
+            // Override theme fg/bg vars so descendants using text-fg-* render
+            // correctly on a white drawer regardless of the page theme.
+            ["--fg-1" as string]: "var(--ink-800)",
+            ["--fg-2" as string]: "var(--ink-600)",
+            ["--bg-sunken" as string]: "var(--ink-100)",
+          } as React.CSSProperties}
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-s-1 px-s-8 py-s-4">
             {items.map((item) => {
@@ -71,7 +76,7 @@ export function MobileMenu({
                   aria-current={active ? "page" : undefined}
                   className="rounded-md px-s-3 py-s-2 text-[14px] transition-colors"
                   style={{
-                    color: active ? "var(--t-accent-soft)" : "var(--t-fg-2)",
+                    color: active ? "var(--brand-indigo-deep)" : "var(--ink-600)",
                     fontWeight: active ? 500 : 400,
                   }}
                 >
@@ -82,20 +87,20 @@ export function MobileMenu({
 
             <div
               className="mt-s-2 flex items-center justify-between gap-s-3 border-t pt-s-3"
-              style={{ borderColor: "var(--t-bar-divider)" }}
+              style={{ borderColor: "var(--ink-200)" }}
             >
               <div className="flex flex-col px-s-3">
-                <span className="text-[13px]" style={{ color: "var(--t-fg-1)" }}>
+                <span className="text-[13px]" style={{ color: "var(--ink-800)" }}>
                   {session.name}
                 </span>
                 <span
                   className="font-mono text-[11px] uppercase"
-                  style={{ letterSpacing: "var(--tracking-eyebrow)", color: "var(--t-fg-2)" }}
+                  style={{ letterSpacing: "var(--tracking-eyebrow)", color: "var(--ink-600)" }}
                 >
                   {roleLabel}
                 </span>
               </div>
-              <SignOutButton />
+              <span style={{ color: "var(--ink-600)" }}><SignOutButton /></span>
             </div>
           </div>
         </div>
