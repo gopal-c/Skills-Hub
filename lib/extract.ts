@@ -1,12 +1,33 @@
-import { NextResponse } from "next/server";
+/**
+ * Resume PDF → structured profile via Groq's llama-3.3-70b-versatile.
+ * Single shared helper used by /api/employees (HR onboarding) and
+ * /api/me/upload-resume (employee self-update). Throws `ExtractError`
+ * with a status code so callers can translate to HTTP responses.
+ */
+
 import OpenAI from "openai";
 import { extractText, getDocumentProxy } from "unpdf";
-import { addProfile, createUserForProfile, type Proficiency, type Seniority } from "@/lib/store";
-import { requireRole } from "@/lib/session";
+import type { Proficiency, Seniority } from "./store";
 
-export const runtime = "nodejs";
-export const maxDuration = 60;
-export const dynamic = "force-dynamic";
+export type ExtractedProfile = {
+  name: string;
+  email: string;
+  city: string;
+  seniority: Seniority;
+  yearsExperience: number;
+  skills:    Array<{ name: string; category: string; proficiency: Proficiency; yearsExperience: number }>;
+  projects:  Array<{ name: string; description: string; skillsUsed: string[]; duration: string }>;
+  education: Array<{ degree: string; institution: string; year: number }>;
+};
+
+export class ExtractError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ExtractError";
+    this.status = status;
+  }
+}
 
 const SYSTEM_PROMPT = `You are a careful resume parser. Read the resume text and return a JSON object that fits this exact shape:
 
@@ -31,18 +52,7 @@ Guidance:
 const VALID_SENIORITY: Seniority[]     = ["junior", "mid", "senior", "lead"];
 const VALID_PROFICIENCY: Proficiency[] = ["beginner", "intermediate", "advanced", "expert"];
 
-type Extracted = {
-  name: string;
-  email: string;
-  city: string;
-  seniority: Seniority;
-  yearsExperience: number;
-  skills:    Array<{ name: string; category: string; proficiency: Proficiency; yearsExperience: number }>;
-  projects:  Array<{ name: string; description: string; skillsUsed: string[]; duration: string }>;
-  education: Array<{ degree: string; institution: string; year: number }>;
-};
-
-function coerce(raw: unknown): Extracted | null {
+function coerce(raw: unknown): ExtractedProfile | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
 
@@ -51,7 +61,6 @@ function coerce(raw: unknown): Extracted | null {
   const city      = typeof r.city      === "string" ? r.city      : "";
   const seniority = VALID_SENIORITY.includes(r.seniority as Seniority) ? (r.seniority as Seniority) : "mid";
   const yearsExperience = typeof r.yearsExperience === "number" ? r.yearsExperience : 0;
-
   if (!name) return null;
 
   const skills = Array.isArray(r.skills) ? r.skills.flatMap((s: unknown) => {
@@ -92,40 +101,28 @@ function coerce(raw: unknown): Extracted | null {
   return { name, email, city, seniority, yearsExperience, skills, projects, education };
 }
 
-export async function POST(req: Request) {
-  await requireRole("employee");
-
+/** Extracts a structured profile from a resume PDF. Throws ExtractError on failure. */
+export async function extractProfileFromPdf(buffer: Uint8Array | Buffer): Promise<ExtractedProfile> {
   if (!process.env.GROQ_API_KEY) {
-    return NextResponse.json({ ok: false, error: "GROQ_API_KEY not configured." }, { status: 503 });
+    throw new ExtractError("GROQ_API_KEY not configured.", 503);
   }
 
-  let pdfBytes: Uint8Array;
-  try {
-    const form = await req.formData();
-    const file = form.get("file");
-    if (!(file instanceof File)) {
-      return NextResponse.json({ ok: false, error: "No file uploaded." }, { status: 400 });
-    }
-    const buf = await file.arrayBuffer();
-    pdfBytes = new Uint8Array(buf);
-  } catch {
-    return NextResponse.json({ ok: false, error: "Couldn't read the upload." }, { status: 400 });
-  }
-
+  // 1. PDF → text
   let resumeText: string;
   try {
-    const pdf = await getDocumentProxy(pdfBytes);
+    const pdf = await getDocumentProxy(buffer as Uint8Array);
     const result = await extractText(pdf, { mergePages: true });
     resumeText = Array.isArray(result.text) ? result.text.join("\n") : result.text;
-    if (!resumeText.trim()) {
-      return NextResponse.json({ ok: false, error: "We couldn't read any text from that PDF. Is it scanned?" }, { status: 422 });
-    }
   } catch (err) {
     const message = err instanceof Error ? err.message : "PDF parsing failed";
-    return NextResponse.json({ ok: false, error: `PDF parsing failed: ${message}` }, { status: 422 });
+    throw new ExtractError(`PDF parsing failed: ${message}`, 422);
+  }
+  if (!resumeText.trim()) {
+    throw new ExtractError("We couldn't read any text from that PDF. Is it scanned?", 422);
   }
 
-  let extracted: Extracted | null = null;
+  // 2. Text → structured JSON via Groq
+  let parsed: unknown;
   try {
     const groq = new OpenAI({
       apiKey: process.env.GROQ_API_KEY,
@@ -140,27 +137,16 @@ export async function POST(req: Request) {
         { role: "user",   content: `Resume text:\n\n${resumeText.slice(0, 18000)}` },
       ],
     });
-    const content = completion.choices[0]?.message?.content ?? "{}";
-    extracted = coerce(JSON.parse(content));
+    parsed = JSON.parse(completion.choices[0]?.message?.content ?? "{}");
   } catch (err) {
     const message = err instanceof Error ? err.message : "extraction failed";
-    return NextResponse.json({ ok: false, error: `Extraction failed: ${message}` }, { status: 502 });
+    throw new ExtractError(`Extraction failed: ${message}`, 502);
   }
 
+  // 3. Validate / coerce
+  const extracted = coerce(parsed);
   if (!extracted) {
-    return NextResponse.json({ ok: false, error: "We couldn't pull a structured profile out of that resume." }, { status: 422 });
+    throw new ExtractError("We couldn't pull a structured profile out of that resume.", 422);
   }
-
-  try {
-    const profile = await addProfile(extracted);
-    // Best-effort: create a login for the resume's email (Demo@123).
-    // Existing accounts are no-ops via ON CONFLICT DO NOTHING.
-    if (extracted.email) {
-      await createUserForProfile(extracted.email, extracted.name, "employee").catch(() => {});
-    }
-    return NextResponse.json({ ok: true, id: profile.id });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "save failed";
-    return NextResponse.json({ ok: false, error: `Couldn't save profile: ${message}` }, { status: 500 });
-  }
+  return extracted;
 }
