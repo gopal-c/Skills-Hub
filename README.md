@@ -12,7 +12,7 @@ AI-powered skills intelligence for HR teams. Built for [Hackathon Name] in 48 ho
 Next.js 14 · TypeScript · Tailwind · shadcn/ui · Postgres (Neon) · Groq (Llama 3.3 70B) · JWT auth
 
 ## Demo
-🔗 [Live demo]([your-vercel-url].vercel.app)
+🔗 [Live demo](https://z-index-9999-skills-hub.vercel.app/)
 
 **Login:**
 - HR: `hr@demo.com` / `Demo@123`
