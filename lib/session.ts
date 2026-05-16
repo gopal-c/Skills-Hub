@@ -1,20 +1,27 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ROLE_COOKIE, ROLE_HOME, isValidRole, type Role } from "./auth";
+import { SESSION_COOKIE, ROLE_HOME, verifySession, type Role, type SessionPayload } from "./auth";
 
-/** Current role from the cookie, or null. */
-export function getRole(): Role | null {
-  const value = cookies().get(ROLE_COOKIE)?.value;
-  return isValidRole(value) ? value : null;
+/** Read + verify the JWT session cookie from a server component or route handler. */
+export async function getSession(): Promise<SessionPayload | null> {
+  const token = cookies().get(SESSION_COOKIE)?.value;
+  return verifySession(token);
+}
+
+/** Require any authenticated session — redirects to / if absent or invalid. */
+export async function requireSession(): Promise<SessionPayload> {
+  const session = await getSession();
+  if (!session) redirect("/");
+  return session;
 }
 
 /**
- * Enforce a role on the current request from a server component or route.
- * Pass `"any"` to require *some* role without caring which.
+ * Require a specific role (or "any" authenticated user).
+ * Returns the full session payload — consumers can pull role/name/userId off it.
+ * Mismatched role redirects to the user's own home.
  */
-export function requireRole(required: Role | "any"): Role {
-  const current = getRole();
-  if (!current) redirect("/");
-  if (required !== "any" && current !== required) redirect(ROLE_HOME[current]);
-  return current;
+export async function requireRole(role: Role | "any"): Promise<SessionPayload> {
+  const session = await requireSession();
+  if (role !== "any" && session.role !== role) redirect(ROLE_HOME[session.role]);
+  return session;
 }

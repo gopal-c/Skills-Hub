@@ -2,12 +2,12 @@ import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
 import { UploadForm } from "./upload-form";
 
-export default function UploadPage() {
-  const role = requireRole("employee");
+export default async function UploadPage() {
+  const session = await requireRole("employee");
 
   return (
     <main className="min-h-screen bg-bg-page">
-      <RoleHeader role={role} eyebrow="Employee · Upload" />
+      <RoleHeader session={session} eyebrow="Employee · Upload" />
       <section className="mx-auto max-w-2xl px-s-8 py-s-12">
         <span className="eyebrow eyebrow-coral">Step 1</span>
         <h1 className="mt-s-2">

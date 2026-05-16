@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { ROLE_COOKIE, ROLE_HOME, isValidRole, type Role } from "@/lib/auth";
+import { SESSION_COOKIE, ROLE_HOME, verifySession, type Role } from "@/lib/auth";
 
 const HR_ONLY        = ["/search", "/review"];
 const EMPLOYEE_ONLY  = ["/upload"];
@@ -16,23 +16,23 @@ function requiredFor(pathname: string): Role | "any" | null {
   return null;
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const required = requiredFor(req.nextUrl.pathname);
   if (!required) return NextResponse.next();
 
-  const cookie = req.cookies.get(ROLE_COOKIE)?.value;
-  const role   = isValidRole(cookie) ? cookie : null;
+  const token   = req.cookies.get(SESSION_COOKIE)?.value;
+  const session = await verifySession(token);
 
-  if (!role) {
+  if (!session) {
     const url = req.nextUrl.clone();
     url.pathname = "/";
     url.search   = "";
     return NextResponse.redirect(url);
   }
 
-  if (required !== "any" && role !== required) {
+  if (required !== "any" && session.role !== required) {
     const url = req.nextUrl.clone();
-    url.pathname = ROLE_HOME[role];
+    url.pathname = ROLE_HOME[session.role];
     url.search   = "";
     return NextResponse.redirect(url);
   }

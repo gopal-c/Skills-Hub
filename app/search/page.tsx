@@ -6,12 +6,12 @@ import { SearchPanel } from "@/components/search-panel";
 export const dynamic = "force-dynamic";
 
 export default async function SearchPage() {
-  const role = requireRole("hr");
+  const session = await requireRole("hr");
   const profiles = await getApprovedProfiles();
 
   return (
     <main className="min-h-screen bg-bg-page">
-      <RoleHeader role={role} eyebrow="HR · Search" />
+      <RoleHeader session={session} eyebrow="HR · Search" />
       <section className="mx-auto max-w-3xl px-s-8 py-s-12">
         <span className="eyebrow eyebrow-indigo">Search</span>
         <h1 className="mt-s-2">

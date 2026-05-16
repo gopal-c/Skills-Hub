@@ -15,13 +15,13 @@ const STATUS_VARIANT: Record<string, "secondary" | "outline" | "destructive"> = 
 };
 
 export default async function ReviewProfilePage({ params }: { params: { id: string } }) {
-  const role = requireRole("hr");
+  const session = await requireRole("hr");
   const profile = await getProfile(params.id);
   if (!profile) notFound();
 
   return (
     <main className="min-h-screen bg-bg-page">
-      <RoleHeader role={role} eyebrow="HR · Review" />
+      <RoleHeader session={session} eyebrow="HR · Review" />
       <section className="mx-auto max-w-4xl px-s-8 py-s-10">
         <Link href="/review" className="text-[13px] text-fg-2 hover:text-fg-1">&larr; Back to queue</Link>
 

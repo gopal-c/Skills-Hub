@@ -19,7 +19,7 @@ export async function GET(_req: Request, { params }: Params) {
 }
 
 export async function PATCH(req: Request, { params }: Params) {
-  requireRole("hr");
+  await requireRole("hr");
   const body = (await req.json()) as Record<string, unknown>;
 
   const allowed = ["name", "email", "city", "seniority", "yearsExperience", "skills", "projects", "education", "status"] as const;
@@ -36,7 +36,7 @@ export async function PATCH(req: Request, { params }: Params) {
 }
 
 export async function DELETE(_req: Request, { params }: Params) {
-  requireRole("hr");
+  await requireRole("hr");
   const ok = await deleteProfile(params.id);
   if (!ok) return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
   return NextResponse.json({ ok: true });

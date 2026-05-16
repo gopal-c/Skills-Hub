@@ -20,10 +20,7 @@ export function isValidRole(value: unknown): value is Role {
   return value === "hr" || value === "employee";
 }
 
-/* ─────────── Legacy role-switcher cookie (removed in the next commit) ─────────── */
-export const ROLE_COOKIE = "skillshub_role";
-
-/* ─────────── New JWT session ─────────── */
+/* ─────────── JWT session ─────────── */
 
 export const SESSION_COOKIE = "session";
 

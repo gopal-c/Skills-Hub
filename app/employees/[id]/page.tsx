@@ -48,7 +48,7 @@ function proficiencyClass(p: string): string {
 }
 
 export default async function EmployeeProfilePage({ params }: { params: { id: string } }) {
-  const role = requireRole("any");
+  const session = await requireRole("any");
   const profile = await getProfile(params.id);
   if (!profile) notFound();
 
@@ -56,7 +56,7 @@ export default async function EmployeeProfilePage({ params }: { params: { id: st
 
   return (
     <main className="min-h-screen bg-bg-page">
-      <RoleHeader role={role} eyebrow="Directory · Profile" />
+      <RoleHeader session={session} eyebrow="Directory · Profile" />
 
       <section className="mx-auto max-w-4xl px-s-8 py-s-10">
         <Link href="/employees" className="text-[13px] text-fg-2 hover:text-fg-1">&larr; Back to directory</Link>
@@ -74,7 +74,7 @@ export default async function EmployeeProfilePage({ params }: { params: { id: st
             </p>
           </div>
 
-          {role === "hr" && (
+          {session.role === "hr" && (
             <div className="flex items-center gap-s-2">
               <Link
                 href={`/review/${profile.id}`}

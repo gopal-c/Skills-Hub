@@ -44,7 +44,7 @@ function compactProfile(p: Profile, idx: number) {
 }
 
 export async function POST(req: Request) {
-  requireRole("hr");
+  await requireRole("hr");
 
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({ ok: false, error: "GROQ_API_KEY not configured." }, { status: 503 });

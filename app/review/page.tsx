@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 export default async function ReviewQueuePage() {
-  const role = requireRole("hr");
+  const session = await requireRole("hr");
   const pending = await getPendingProfiles();
 
   return (
     <main className="min-h-screen bg-bg-page">
-      <RoleHeader role={role} eyebrow="HR · Review queue" />
+      <RoleHeader session={session} eyebrow="HR · Review queue" />
       <section className="mx-auto max-w-5xl px-s-8 py-s-12">
         <span className="eyebrow eyebrow-coral">Review queue</span>
         <h1 className="mt-s-2">

@@ -12,6 +12,9 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { sql } from "@vercel/postgres";
 import bcrypt from "bcryptjs";
+import type { Role } from "./auth";
+
+export type { Role };
 
 export type Proficiency = "beginner" | "intermediate" | "advanced" | "expert";
 export type Seniority   = "junior" | "mid" | "senior" | "lead";
@@ -50,8 +53,6 @@ export type Profile = {
   status: Status;
   createdAt: string;
 };
-
-export type Role = "hr" | "employee";
 
 export type User = {
   id: string;

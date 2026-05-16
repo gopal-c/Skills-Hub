@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 export default async function EmployeesDirectoryPage() {
-  const role = requireRole("any");
+  const session = await requireRole("any");
   const profiles = await getApprovedProfiles();
 
   return (
     <main className="min-h-screen bg-bg-page">
-      <RoleHeader role={role} eyebrow="Directory" />
+      <RoleHeader session={session} eyebrow="Directory" />
       <section className="mx-auto max-w-6xl px-s-8 py-s-12">
         <span className="eyebrow">Directory</span>
         <h1 className="mt-s-2">
