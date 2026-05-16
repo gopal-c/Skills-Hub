@@ -19,7 +19,7 @@ const NAV: Record<Role, Array<{ href: string; label: string }>> = {
   ],
   employee: [
     { href: "/me",     label: "My Profile" },
-    { href: "/upload", label: "Upload Resume" },
+    { href: "/upload", label: "Update Resume" },
   ],
 };
 

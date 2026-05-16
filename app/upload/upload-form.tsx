@@ -39,14 +39,14 @@ export function UploadForm() {
       const fd = new FormData();
       fd.append("file", file);
       try {
-        const res = await fetch("/api/extract", { method: "POST", body: fd });
+        const res = await fetch("/api/me/upload-resume", { method: "POST", body: fd });
         const data = await res.json();
         if (!data.ok) {
           toast.error(data.error ?? "Couldn't read that resume.");
           return;
         }
-        toast.success("Profile created. Pending review.");
-        router.push(`/employees/${data.id}`);
+        toast.success("Profile updated. Awaiting re-approval.");
+        router.push("/me");
         router.refresh();
       } catch {
         toast.error("Network error — try again.");
@@ -56,8 +56,8 @@ export function UploadForm() {
 
   return (
     <section className="form-card">
-      <h2>Upload a resume</h2>
-      <p className="lede">PDF only, please. We&rsquo;ll handle the rest.</p>
+      <h2>Refresh your profile from a resume</h2>
+      <p className="lede">PDF only, please. We&rsquo;ll re-extract everything and send it for re-approval.</p>
 
       <label className="field-label">Resume PDF</label>
 
@@ -115,7 +115,7 @@ export function UploadForm() {
 
         <div className="form-actions">
           <button type="submit" className="btn-primary" disabled={!file || isPending}>
-            {isPending ? "Extracting…" : "Extract & submit for review →"}
+            {isPending ? "Updating…" : "Update my profile →"}
           </button>
         </div>
       </form>
