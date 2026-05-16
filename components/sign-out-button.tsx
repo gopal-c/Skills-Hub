@@ -24,7 +24,8 @@ export function SignOutButton() {
       type="button"
       onClick={signOut}
       disabled={isPending}
-      className="rounded-md px-s-2 py-s-1 transition-colors hover:bg-bg-sunken hover:text-fg-1 disabled:opacity-50"
+      data-signout
+      className="rounded-md px-s-2 py-s-1 text-[13px] text-fg-2 transition-colors hover:bg-bg-sunken hover:text-fg-1 disabled:opacity-50"
     >
       {isPending ? "Signing out…" : "Sign out"}
     </button>

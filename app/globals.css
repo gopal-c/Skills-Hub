@@ -628,7 +628,7 @@
   display: inline-flex; align-items: center; gap: 10px;
   padding: 8px 14px 8px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(22px) saturate(160%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.85);
@@ -657,9 +657,9 @@
   padding: 22px 24px;
   border-radius: 20px;
   background: linear-gradient(155deg,
-                rgba(255, 255, 255, 0.62) 0%,
-                rgba(255, 255, 255, 0.40) 60%,
-                rgba(255, 255, 255, 0.52) 100%);
+                rgba(255, 255, 255, 0.82) 0%,
+                rgba(255, 255, 255, 0.60) 60%,
+                rgba(255, 255, 255, 0.72) 100%);
   backdrop-filter: blur(36px) saturate(180%);
   -webkit-backdrop-filter: blur(36px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.85);
@@ -715,9 +715,9 @@
   border-radius: 20px;
   background:
     linear-gradient(155deg,
-      rgba(139, 123, 232, 0.16) 0%,
-      rgba(255, 255, 255, 0.38) 35%,
-      rgba(124, 211, 197, 0.18) 100%);
+      rgba(139, 123, 232, 0.36) 0%,
+      rgba(255, 255, 255, 0.58) 35%,
+      rgba(124, 211, 197, 0.38) 100%);
   backdrop-filter: blur(36px) saturate(180%);
   -webkit-backdrop-filter: blur(36px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.80);
@@ -1239,4 +1239,11 @@
   border: 1px solid var(--t-pill-border);
   color: var(--t-pill-fg);
   backdrop-filter: blur(8px);
+}
+
+/* Sign out button — in dark theme, hover bg is light, so hover text must
+   go dark for contrast (default Tailwind hover:text-fg-1 stays white in
+   dark theme, which reads white-on-light = unreadable). */
+[data-theme="dark"] [data-signout]:hover:not(:disabled) {
+  color: var(--ink-800);
 }
