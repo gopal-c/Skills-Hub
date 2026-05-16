@@ -103,7 +103,7 @@ export function ProfileView({
           <p className="text-[14px] text-fg-2">No skills on record.</p>
         ) : (
           grouped.map(([cat, items]) => (
-            <div key={cat}>
+            <div key={cat} className="mt-6">
               <div className="cat">{CATEGORY_LABEL[cat] ?? cat}</div>
               <div className="skill-row">
                 {items.map((s) => (

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, ROLE_HOME, verifySession, type Role } from "@/lib/auth";
 
-const HR_ONLY        = ["/search", "/review"];
+const HR_ONLY        = ["/search", "/review", "/onboard"];
 const EMPLOYEE_ONLY  = ["/upload", "/me"];
 const ANY_ROLE       = ["/employees", "/profile"];
 
@@ -44,6 +44,7 @@ export const config = {
   matcher: [
     "/search/:path*",
     "/review/:path*",
+    "/onboard/:path*",
     "/upload/:path*",
     "/profile/:path*",
     "/me/:path*",

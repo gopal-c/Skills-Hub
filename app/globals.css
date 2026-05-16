@@ -477,13 +477,13 @@
   font: var(--t-mono-s);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--brand-indigo-deep);
-  background: rgba(139, 123, 232, 0.14);
+  color: rgba(0,0,0,0.6);
+  background: rgba(139, 123, 232, 0.34);
   border: 1px solid rgba(139, 123, 232, 0.25);
 }
-.directory-v2 .level-pill.lead   { color: #C75A45; background: rgba(255,154,130,0.18); border-color: rgba(255,154,130,0.35); }
-.directory-v2 .level-pill.senior { color: #2D8478; background: rgba(124,211,197,0.20); border-color: rgba(124,211,197,0.35); }
-.directory-v2 .level-pill.mid    { color: #8A5C0C; background: rgba(255,203,107,0.22); border-color: rgba(255,203,107,0.40); }
+.directory-v2 .level-pill.lead   { background: rgba(255,154,130,0.38); border-color: rgba(255,154,130,0.35); }
+.directory-v2 .level-pill.senior { background: rgba(124,211,197,0.40); border-color: rgba(124,211,197,0.35); }
+.directory-v2 .level-pill.mid    { background: rgba(255,203,107,0.42); border-color: rgba(255,203,107,0.40); }
 
 .directory-v2 .id-loc {
   font: var(--t-body-s); color: var(--ink-600);
@@ -509,7 +509,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #C75A45;
-  background: rgba(255, 154, 130, 0.18);
+  background: rgba(255, 154, 130, 0.38);
   border: 1px solid rgba(255, 154, 130, 0.45);
 }
 .directory-v2 .id-row .pending-badge::before {
@@ -1201,7 +1201,7 @@
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(124, 211, 197, 0.14);
+  background: rgba(124, 211, 197, 0.44);
   border: 1px solid rgba(124, 211, 197, 0.40);
 }
 .upload-v2 .file-icon {
