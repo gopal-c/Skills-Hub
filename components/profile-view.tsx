@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteProfileButton } from "@/components/delete-profile-button";
 import { ProfileAvatar } from "@/components/profile-avatar";
+import { EditableAvatar } from "@/components/editable-avatar";
 import type { Profile, Skill } from "@/lib/store";
 
 const CATEGORY_ORDER = ["language", "framework", "database", "cloud", "tool", "domain", "soft"];
@@ -43,14 +44,26 @@ function proficiencyClass(p: string): string {
   }
 }
 
-export function ProfileView({ profile, canManage }: { profile: Profile; canManage: boolean }) {
+export function ProfileView({
+  profile,
+  canManage,
+  editableAvatar = false,
+}: {
+  profile: Profile;
+  canManage: boolean;
+  editableAvatar?: boolean;
+}) {
   const grouped = groupByCategory(profile.skills);
 
   return (
     <>
       <header className="flex flex-wrap items-end justify-between gap-s-4 border-b border-border-hairline pb-s-6">
-        <div className="flex items-center gap-s-4">
-          <ProfileAvatar name={profile.name} email={profile.email} className="size-16 flex-shrink-0" />
+        <div className="flex items-start gap-s-4">
+          {editableAvatar ? (
+            <EditableAvatar profile={profile} className="size-16 flex-shrink-0" />
+          ) : (
+            <ProfileAvatar name={profile.name} email={profile.email} className="size-16 flex-shrink-0" />
+          )}
           <div>
             <span className="eyebrow eyebrow-indigo">{profile.seniority}</span>
             <h1 className="mt-s-2">{profile.name}</h1>

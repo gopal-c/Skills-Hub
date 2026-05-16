@@ -23,7 +23,7 @@ export default async function MePage() {
               <Eye className="size-4 flex-shrink-0" />
               <span>This is how others see your profile.</span>
             </div>
-            <ProfileView profile={profile} canManage={false} />
+            <ProfileView profile={profile} canManage={false} editableAvatar />
           </>
         ) : (
           <EmptyProfileState />

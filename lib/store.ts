@@ -334,6 +334,18 @@ export async function updateProfile(
   return rows[0] ? rowToProfile(rows[0]) : undefined;
 }
 
+export async function updateAvatarByEmail(
+  email: string,
+  avatarUrl: string | null,
+): Promise<Profile | undefined> {
+  const { rows } = await sql<Row>`
+    UPDATE profiles SET avatar_url = ${avatarUrl}
+    WHERE lower(email) = ${email.toLowerCase()}
+    RETURNING *
+  `;
+  return rows[0] ? rowToProfile(rows[0]) : undefined;
+}
+
 export async function setProfileStatus(
   id: string,
   status: Status,
