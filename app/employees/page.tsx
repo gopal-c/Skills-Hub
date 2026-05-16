@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
 import { getApprovedProfiles } from "@/lib/store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { DirectoryGrid } from "@/components/directory-grid";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +19,8 @@ export default async function EmployeesDirectoryPage() {
           {profiles.length} {profiles.length === 1 ? "person" : "people"}
         </h1>
         <p className="mt-s-3 max-w-xl text-[15px] text-fg-2">
-          Approved profiles, ready to be searched. Click any card to see the full picture.
+          Approved profiles, ready to be searched. Filter by name, skill, city,
+          or seniority &mdash; or open one to see the full picture.
         </p>
 
         {profiles.length === 0 ? (
@@ -36,36 +36,7 @@ export default async function EmployeesDirectoryPage() {
             </CardContent>
           </Card>
         ) : (
-          <ul className="mt-s-8 grid gap-s-4 sm:grid-cols-2 lg:grid-cols-3">
-            {profiles.map((p) => (
-              <li key={p.id}>
-                <Link href={`/employees/${p.id}`} className="block">
-                  <Card className="h-full transition-all duration-base ease-out hover:-translate-y-px hover:shadow-2">
-                    <CardHeader>
-                      <CardTitle className="text-[17px]">{p.name}</CardTitle>
-                      <p className="text-[13px] text-fg-2">
-                        {p.seniority} &middot; {p.city} &middot; {p.yearsExperience} yrs
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-s-1">
-                        {p.skills.slice(0, 5).map((s) => (
-                          <Badge key={s.name} variant="secondary" className="font-mono text-[11px]">
-                            {s.name}
-                          </Badge>
-                        ))}
-                        {p.skills.length > 5 && (
-                          <Badge variant="outline" className="font-mono text-[11px]">
-                            +{p.skills.length - 5}
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <DirectoryGrid profiles={profiles} />
         )}
       </section>
     </main>
