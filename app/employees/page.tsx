@@ -1,6 +1,6 @@
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
-import { getApprovedProfiles } from "@/lib/store";
+import { getDirectoryProfiles } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { DirectoryGrid } from "@/components/directory-grid";
 
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function EmployeesDirectoryPage() {
   const session = await requireRole("any");
-  const profiles = await getApprovedProfiles();
+  const profiles = await getDirectoryProfiles();
   const theme    = session.role === "hr" ? "light" : "dark";
 
   return (

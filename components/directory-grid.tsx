@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { avatarPalette, initials } from "@/lib/avatar-gradient";
+import { ProfileCard } from "@/components/profile-card";
 import type { Profile } from "@/lib/store";
 
 function matches(p: Profile, q: string): boolean {
@@ -13,12 +12,9 @@ function matches(p: Profile, q: string): boolean {
   if (p.name.toLowerCase().includes(ql))      return true;
   if (p.city.toLowerCase().includes(ql))      return true;
   if (p.seniority.toLowerCase().includes(ql)) return true;
+  if (p.status.toLowerCase().includes(ql))    return true;
   if (p.skills.some((s) => s.name.toLowerCase().includes(ql))) return true;
   return false;
-}
-
-function empId(i: number): string {
-  return `SH-25${String(i + 1).padStart(3, "0")}`;
 }
 
 export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
@@ -33,7 +29,7 @@ export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Find anyone — name, skill, location, or role…"
+            placeholder="Find anyone — name, skill, location, or status…"
           />
           {query && (
             <button
@@ -64,50 +60,14 @@ export function DirectoryGrid({ profiles }: { profiles: Profile[] }) {
         </Card>
       ) : (
         <div className="grid">
-          {filtered.map((p, i) => {
-            const palette = avatarPalette(p.name);
-            const visibleSkills = p.skills.slice(0, 3);
-            const more = p.skills.length - visibleSkills.length;
-            return (
-              <Link
-                href={`/employees/${p.id}`}
-                key={p.id}
-                className="id-card"
-                style={{ "--halo": palette.halo } as React.CSSProperties}
-              >
-                <div className="id-avatar-wrap">
-                  {p.avatarUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={p.avatarUrl} alt={p.name} className="id-avatar" />
-                  ) : (
-                    <div
-                      className="id-avatar"
-                      style={{ background: `linear-gradient(135deg, ${palette.grad[0]}, ${palette.grad[1]})` }}
-                    >
-                      {initials(p.name)}
-                    </div>
-                  )}
-                  <span className="id-status" title="Approved" />
-                </div>
-
-                <div className="id-name">{p.name}</div>
-                <span className={`level-pill ${p.seniority}`}>{p.seniority}</span>
-                <div className="id-loc">{p.city}</div>
-
-                <div className="id-skills">
-                  {visibleSkills.map((s) => (
-                    <span key={s.name} className="id-skill">{s.name}</span>
-                  ))}
-                  {more > 0 && <span className="id-skill more">+{more}</span>}
-                </div>
-
-                <div className="id-row">
-                  <span>{empId(i)}</span>
-                  <span className="yrs">{p.yearsExperience} yrs</span>
-                </div>
-              </Link>
-            );
-          })}
+          {filtered.map((p, i) => (
+            <ProfileCard
+              key={p.id}
+              profile={p}
+              index={i}
+              href={`/employees/${p.id}`}
+            />
+          ))}
         </div>
       )}
     </div>

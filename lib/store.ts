@@ -290,6 +290,17 @@ export async function getPendingProfiles(): Promise<Profile[]> {
   return rows.map(rowToProfile);
 }
 
+/** Approved + pending — what the directory shows (skips rejected). */
+export async function getDirectoryProfiles(): Promise<Profile[]> {
+  await ensureSeeded();
+  const { rows } = await sql<Row>`
+    SELECT * FROM profiles
+    WHERE status IN ('approved', 'pending')
+    ORDER BY created_at DESC
+  `;
+  return rows.map(rowToProfile);
+}
+
 export async function addProfile(
   input: Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl">,
 ): Promise<Profile> {

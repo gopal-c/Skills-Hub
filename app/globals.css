@@ -460,6 +460,9 @@
   background: var(--brand-teal);
   box-shadow: 0 0 0 3px rgba(255,255,255,0.85);
 }
+.directory-v2 .id-status.pending {
+  background: var(--brand-coral-deep);
+}
 
 .directory-v2 .id-name {
   font: 600 19px/1.2 var(--font-sans);
@@ -497,6 +500,24 @@
   text-transform: uppercase;
 }
 .directory-v2 .id-row .yrs { color: var(--ink-800); font-weight: 500; }
+
+.directory-v2 .id-row .pending-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 9px 3px 7px;
+  border-radius: 999px;
+  font: var(--t-mono-s);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #C75A45;
+  background: rgba(255, 154, 130, 0.18);
+  border: 1px solid rgba(255, 154, 130, 0.45);
+}
+.directory-v2 .id-row .pending-badge::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--brand-coral-deep);
+  box-shadow: 0 0 0 2px rgba(255, 154, 130, 0.30);
+}
 
 .directory-v2 .id-skills {
   display: flex; gap: 5px; flex-wrap: wrap;
