@@ -1,11 +1,16 @@
-/** Role-switcher state. No password, no user table — a plain cookie. */
+/**
+ * Edge-safe auth primitives: types, constants, JWT sign/verify.
+ * Anything that touches next/headers `cookies()` lives in lib/session.ts
+ * so middleware (edge runtime) can import this file safely.
+ */
+
+import { SignJWT, jwtVerify } from "jose";
 
 export type Role = "hr" | "employee";
 
 export const ROLES: Role[] = ["hr", "employee"];
 
-export const ROLE_COOKIE = "skillshub_role";
-
+/** Where each role lands after login. */
 export const ROLE_HOME: Record<Role, string> = {
   hr:       "/search",
   employee: "/upload",
@@ -13,4 +18,50 @@ export const ROLE_HOME: Record<Role, string> = {
 
 export function isValidRole(value: unknown): value is Role {
   return value === "hr" || value === "employee";
+}
+
+/* ─────────── Legacy role-switcher cookie (removed in the next commit) ─────────── */
+export const ROLE_COOKIE = "skillshub_role";
+
+/* ─────────── New JWT session ─────────── */
+
+export const SESSION_COOKIE = "session";
+
+export type SessionPayload = {
+  userId: string;
+  role: Role;
+  name: string;
+};
+
+function getSecret(): Uint8Array {
+  const s = process.env.JWT_SECRET;
+  if (!s || s.length < 32) {
+    throw new Error("JWT_SECRET must be set to a 32+ character string");
+  }
+  return new TextEncoder().encode(s);
+}
+
+export async function signSession(payload: SessionPayload): Promise<string> {
+  return await new SignJWT({ role: payload.role, name: payload.name })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(payload.userId)
+    .setIssuedAt()
+    .setExpirationTime("24h")
+    .sign(getSecret());
+}
+
+export async function verifySession(token: string | undefined | null): Promise<SessionPayload | null> {
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, getSecret(), { algorithms: ["HS256"] });
+    const sub  = payload.sub;
+    const role = payload.role;
+    const name = payload.name;
+    if (typeof sub  !== "string") return null;
+    if (role !== "hr" && role !== "employee") return null;
+    if (typeof name !== "string") return null;
+    return { userId: sub, role, name };
+  } catch {
+    return null;
+  }
 }
