@@ -1,4 +1,28 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkillsHub
+
+AI-powered skills intelligence for HR teams. Built for [Hackathon Name] in 48 hours.
+
+## What it does
+- **HR onboards employees** by uploading resumes → AI extracts skills, proficiency, projects
+- **Semantic search** with plain-English reasoning (not just keyword matching)
+- **Employees update** their own profiles and photos
+
+## Stack
+Next.js 14 · TypeScript · Tailwind · shadcn/ui · Postgres (Neon) · Groq (Llama 3.3 70B) · JWT auth
+
+## Demo
+🔗 [Live demo](https://z-index-9999-skills-hub.vercel.app/)
+
+**Login:**
+- HR: `hr@demo.com` / `Demo@123`
+- Employee: any seeded email (try `naveen.rao@demo.com`) / `Demo@123`
+
+## Team
+**z-index: 9999;** — [Gopal Chavan] (UI/UX) + Claude (Dev)
+
+Built May 15–16, 2026.
+
 
 ## Getting Started
 
