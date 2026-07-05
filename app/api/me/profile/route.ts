@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { requireRole } from "@/lib/session";
-import { getProfileByEmail, updateProfile } from "@/lib/store";
+import { getProfileByEmail, getProfileByWorkEmail, updateProfile } from "@/lib/store";
 import { isAllowedWorkEmail, WORK_EMAIL_DOMAIN } from "@/lib/domain";
 import { sendVerificationEmail } from "@/lib/email";
 
@@ -46,6 +46,13 @@ export async function PATCH(req: Request) {
           { status: 400 },
         );
       }
+      const conflict = await getProfileByWorkEmail(newWorkEmail);
+      if (conflict && conflict.id !== existing.id) {
+        return NextResponse.json(
+          { ok: false, error: "That work email is already in use on another account." },
+          { status: 409 },
+        );
+      }
       const token     = randomBytes(32).toString("hex");
       const expiresAt = new Date(Date.now() + VERIFICATION_TTL_MS).toISOString();
       patch.workEmail = newWorkEmail;
@@ -59,10 +66,27 @@ export async function PATCH(req: Request) {
     }
   }
 
-  const updated = await updateProfile(existing.id, patch);
+  let updated;
+  try {
+    updated = await updateProfile(existing.id, patch);
+  } catch (err) {
+    if (isUniqueViolation(err)) {
+      return NextResponse.json(
+        { ok: false, error: "That work email is already in use on another account." },
+        { status: 409 },
+      );
+    }
+    const message = err instanceof Error ? err.message : "update failed";
+    return NextResponse.json({ ok: false, error: `Couldn't save changes: ${message}` }, { status: 500 });
+  }
   if (!updated) {
     return NextResponse.json({ ok: false, error: "Couldn't save changes." }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, profile: updated, verificationSent });
+}
+
+/** Postgres unique_violation. See https://www.postgresql.org/docs/current/errcodes-appendix.html */
+function isUniqueViolation(err: unknown): boolean {
+  return typeof err === "object" && err !== null && (err as { code?: string }).code === "23505";
 }

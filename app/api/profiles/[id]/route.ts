@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/session";
 import {
   getProfile,
+  getProfileByWorkEmail,
   updateProfile,
   deleteProfile,
   type Status,
@@ -45,11 +46,38 @@ export async function PATCH(req: Request, { params }: Params) {
     patch.workEmailVerified = !!workEmail;
     patch.workEmailVerificationToken = null;
     patch.workEmailVerificationExpiresAt = null;
+
+    if (workEmail) {
+      const conflict = await getProfileByWorkEmail(workEmail);
+      if (conflict && conflict.id !== params.id) {
+        return NextResponse.json(
+          { ok: false, error: `${workEmail} is already used by ${conflict.name}'s profile.` },
+          { status: 409 },
+        );
+      }
+    }
   }
 
-  const updated = await updateProfile(params.id, patch as Partial<{ status: Status }>);
+  let updated;
+  try {
+    updated = await updateProfile(params.id, patch as Partial<{ status: Status }>);
+  } catch (err) {
+    if (isUniqueViolation(err)) {
+      return NextResponse.json(
+        { ok: false, error: "That work email is already in use by another profile." },
+        { status: 409 },
+      );
+    }
+    const message = err instanceof Error ? err.message : "update failed";
+    return NextResponse.json({ ok: false, error: `Couldn't save: ${message}` }, { status: 500 });
+  }
   if (!updated) return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
   return NextResponse.json({ ok: true, profile: updated });
+}
+
+/** Postgres unique_violation. See https://www.postgresql.org/docs/current/errcodes-appendix.html */
+function isUniqueViolation(err: unknown): boolean {
+  return typeof err === "object" && err !== null && (err as { code?: string }).code === "23505";
 }
 
 export async function DELETE(_req: Request, { params }: Params) {

@@ -302,6 +302,14 @@ export async function getProfileByEmail(email: string): Promise<Profile | undefi
   return rows[0] ? rowToProfile(rows[0]) : undefined;
 }
 
+export async function getProfileByWorkEmail(workEmail: string): Promise<Profile | undefined> {
+  await ensureSeeded();
+  const { rows } = await sql<Row>`
+    SELECT * FROM profiles WHERE lower(work_email) = ${workEmail.toLowerCase()} LIMIT 1
+  `;
+  return rows[0] ? rowToProfile(rows[0]) : undefined;
+}
+
 export async function getApprovedProfiles(): Promise<Profile[]> {
   await ensureSeeded();
   const { rows } = await sql<Row>`
