@@ -69,6 +69,7 @@ export function RoleButtons() {
         open={open}
         onOpenChange={(v) => setPicked(v ? picked : null)}
         prefillEmail={prefillEmail}
+        showEmployeeLinks={picked === "employee"}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getUserByEmail } from "@/lib/store";
-import { signSession, SESSION_COOKIE } from "@/lib/auth";
+import { getUserByEmail, getProfileByEmail } from "@/lib/store";
+import { signSession, SESSION_COOKIE, ROLE_HOME } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -50,7 +50,18 @@ export async function POST(req: Request) {
     name:   user.name,
   });
 
-  const res = NextResponse.json({ ok: true, role: user.role });
+  // Self-signup accounts (profile.workEmail set) are gated behind HR
+  // approval + email verification — everyone else keeps existing behavior
+  // (resume-onboarded employees can view their own pending profile on /me).
+  let redirectTo = ROLE_HOME[user.role];
+  if (user.role === "employee") {
+    const profile = await getProfileByEmail(user.email);
+    if (profile?.workEmail && (!profile.workEmailVerified || profile.status !== "approved")) {
+      redirectTo = "/pending-approval";
+    }
+  }
+
+  const res = NextResponse.json({ ok: true, role: user.role, redirectTo });
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",

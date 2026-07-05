@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { UserCircle2, Eye } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
@@ -11,6 +12,11 @@ export const dynamic = "force-dynamic";
 export default async function MePage() {
   const session = await requireRole("employee");
   const profile = await getProfileByEmail(session.email);
+
+  // Self-signup accounts stay off the dashboard until verified + HR-approved.
+  if (profile?.workEmail && (!profile.workEmailVerified || profile.status !== "approved")) {
+    redirect("/pending-approval");
+  }
 
   return (
     <div data-theme="dark" className="theme-shell">

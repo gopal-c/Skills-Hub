@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
 import { getProfileByEmail } from "@/lib/store";
@@ -9,6 +10,10 @@ export const dynamic = "force-dynamic";
 export default async function UploadPage() {
   const session = await requireRole("employee");
   const profile = await getProfileByEmail(session.email);
+
+  if (profile?.workEmail && (!profile.workEmailVerified || profile.status !== "approved")) {
+    redirect("/pending-approval");
+  }
 
   return (
     <div data-theme="dark" className="theme-shell">

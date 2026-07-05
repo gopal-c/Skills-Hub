@@ -412,11 +412,7 @@ export async function deleteProfile(id: string): Promise<boolean> {
 
 /* ─────────── Self-signup + work-email verification ─────────── */
 
-export const WORK_EMAIL_DOMAIN = "@valueaddsofttech.com";
-
-export function isAllowedWorkEmail(email: string): boolean {
-  return email.trim().toLowerCase().endsWith(WORK_EMAIL_DOMAIN);
-}
+export { WORK_EMAIL_DOMAIN, isAllowedWorkEmail } from "./domain";
 
 /**
  * Upsert a user account for self-signup. If a users row already exists for
