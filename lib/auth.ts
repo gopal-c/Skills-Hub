@@ -13,7 +13,7 @@ export const ROLES: Role[] = ["hr", "employee"];
 /** Where each role lands after login. */
 export const ROLE_HOME: Record<Role, string> = {
   hr:       "/search",
-  employee: "/me",
+  employee: "/home",
 };
 
 export function isValidRole(value: unknown): value is Role {

@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { SignOutButton } from "@/components/sign-out-button";
 import type { SessionPayload } from "@/lib/auth";
-
-type NavItem = { href: string; label: string };
+import type { NavItem } from "@/components/role-nav-links";
 
 export function MobileMenu({
   session,
@@ -69,6 +68,20 @@ export function MobileMenu({
           <div className="mx-auto flex max-w-6xl flex-col gap-s-1 px-s-8 py-s-4">
             {items.map((item) => {
               const active = isActive(item.href);
+
+              if (item.disabled) {
+                return (
+                  <span
+                    key={item.href}
+                    className="cursor-not-allowed rounded-md px-s-3 py-s-2 text-[14px] opacity-50"
+                    style={{ color: "var(--ink-600)" }}
+                    title="Available once your account is approved"
+                  >
+                    {item.label}
+                  </span>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}

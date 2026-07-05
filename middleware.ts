@@ -1,9 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, ROLE_HOME, verifySession, type Role } from "@/lib/auth";
+import { isEmployeeApproved } from "@/lib/edge-status";
 
 const HR_ONLY        = ["/search", "/review", "/onboard"];
-const EMPLOYEE_ONLY  = ["/upload", "/me", "/pending-approval"];
+const EMPLOYEE_ONLY  = ["/upload", "/me", "/home", "/pending-approval"];
 const ANY_ROLE       = ["/employees", "/profile"];
+
+// Employee routes that additionally require profiles.status === 'approved'.
+// /home and /pending-approval stay reachable in every state — /home is the
+// hub that explains *why* you're gated, so it can't itself be gated.
+const EMPLOYEE_APPROVED_ONLY = ["/upload", "/me"];
 
 function pathMatches(pathname: string, prefixes: string[]): boolean {
   return prefixes.some((p) => pathname === p || pathname.startsWith(p + "/"));
@@ -37,6 +43,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (session.role === "employee" && pathMatches(req.nextUrl.pathname, EMPLOYEE_APPROVED_ONLY)) {
+    const approved = await isEmployeeApproved(session.email);
+    if (!approved) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/home";
+      url.search   = "";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -48,6 +64,7 @@ export const config = {
     "/upload/:path*",
     "/profile/:path*",
     "/me/:path*",
+    "/home/:path*",
     "/pending-approval/:path*",
     "/employees/:path*",
   ],

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/sign-out-button";
 import { ProfileAvatar } from "@/components/profile-avatar";
-import { RoleNavLinks } from "@/components/role-nav-links";
+import { RoleNavLinks, type NavItem } from "@/components/role-nav-links";
 import { MobileMenu } from "@/components/mobile-menu";
 import type { Role, SessionPayload } from "@/lib/auth";
 
@@ -10,22 +10,33 @@ const ROLE_LABEL: Record<Role, string> = {
   employee: "Employee",
 };
 
-const NAV: Record<Role, Array<{ href: string; label: string }>> = {
-  hr: [
-    { href: "/search",    label: "Search" },
-    { href: "/employees", label: "Directory" },
-    { href: "/review",    label: "Review Queue" },
-    { href: "/onboard",   label: "Onboard" },
-  ],
-  employee: [
-    { href: "/me",     label: "My Profile" },
-    { href: "/upload", label: "Update Resume" },
-  ],
-};
+const HR_NAV: NavItem[] = [
+  { href: "/search",    label: "Search" },
+  { href: "/employees", label: "Directory" },
+  { href: "/review",    label: "Review Queue" },
+  { href: "/onboard",   label: "Onboard" },
+];
 
-export function RoleHeader({ session, eyebrow }: { session: SessionPayload; eyebrow: string }) {
-  const nav  = NAV[session.role];
-  const home = session.role === "hr" ? "/search" : "/me";
+function employeeNav(approved: boolean): NavItem[] {
+  return [
+    { href: "/home",   label: "Home" },
+    { href: "/me",     label: "My Profile",    disabled: !approved },
+    { href: "/upload", label: "Update Profile", disabled: !approved },
+  ];
+}
+
+export function RoleHeader({
+  session,
+  eyebrow,
+  employeeApproved = false,
+}: {
+  session: SessionPayload;
+  eyebrow: string;
+  /** Only meaningful for role=employee — gates My Profile / Update Profile in the nav. */
+  employeeApproved?: boolean;
+}) {
+  const nav  = session.role === "hr" ? HR_NAV : employeeNav(employeeApproved);
+  const home = session.role === "hr" ? "/search" : "/home";
 
   return (
     <header className="themed-topbar">

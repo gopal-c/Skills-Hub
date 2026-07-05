@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
@@ -11,8 +10,10 @@ export default async function UploadPage() {
   const session = await requireRole("employee");
   const profile = await getProfileByEmail(session.email);
 
-  if (profile?.workEmail && (!profile.workEmailVerified || profile.status !== "approved")) {
-    redirect("/pending-approval");
+  // Same gate as /me — unapproved employees (no profile yet, or not yet
+  // approved) get routed through /home instead.
+  if (!profile || profile.status !== "approved") {
+    redirect("/home");
   }
 
   return (
@@ -21,7 +22,7 @@ export default async function UploadPage() {
       <div className="theme-glow g2" aria-hidden />
       <div className="theme-glow g3" aria-hidden />
 
-      <RoleHeader session={session} eyebrow="Employee · Update" />
+      <RoleHeader session={session} eyebrow="Employee · Update" employeeApproved />
 
       <main className="upload-v2 relative z-[1] mx-auto max-w-[820px] px-s-8 pb-s-20 pt-s-16">
         <div className="steps">
@@ -40,22 +41,7 @@ export default async function UploadPage() {
           HR will re-approve the changes.
         </p>
 
-        {!profile ? (
-          <section className="form-card mt-s-8">
-            <h2>Profile not created yet</h2>
-            <p className="lede">
-              Your profile hasn&rsquo;t been created yet. Wait for HR to onboard you,
-              then come back here to refresh it any time.
-            </p>
-            <div className="form-actions">
-              <Link href="/me" className="btn-primary">
-                Back to my profile
-              </Link>
-            </div>
-          </section>
-        ) : (
-          <UploadForm />
-        )}
+        <UploadForm />
 
         <div className="next-trail">
           <b>What happens next</b>

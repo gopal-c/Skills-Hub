@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getUserByEmail, getProfileByEmail } from "@/lib/store";
+import { getUserByEmail } from "@/lib/store";
 import { signSession, SESSION_COOKIE, ROLE_HOME } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -50,16 +50,9 @@ export async function POST(req: Request) {
     name:   user.name,
   });
 
-  // Self-signup accounts (profile.workEmail set) are gated behind HR
-  // approval + email verification — everyone else keeps existing behavior
-  // (resume-onboarded employees can view their own pending profile on /me).
-  let redirectTo = ROLE_HOME[user.role];
-  if (user.role === "employee") {
-    const profile = await getProfileByEmail(user.email);
-    if (profile?.workEmail && (!profile.workEmailVerified || profile.status !== "approved")) {
-      redirectTo = "/pending-approval";
-    }
-  }
+  // Every employee lands on /home regardless of approval state — that page
+  // is the single hub that explains what's next and gates /me + /upload.
+  const redirectTo = ROLE_HOME[user.role];
 
   const res = NextResponse.json({ ok: true, role: user.role, redirectTo });
   res.cookies.set(SESSION_COOKIE, token, {
