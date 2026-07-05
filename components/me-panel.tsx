@@ -5,9 +5,9 @@ import { Eye, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileView } from "@/components/profile-view";
 import { ProfileForm } from "@/components/profile-form";
-import type { Profile } from "@/lib/store";
+import type { Profile, Milestone } from "@/lib/store";
 
-export function MePanel({ profile }: { profile: Profile }) {
+export function MePanel({ profile, milestones }: { profile: Profile; milestones: Milestone[] }) {
   const [editing, setEditing] = useState(false);
 
   return (
@@ -25,7 +25,7 @@ export function MePanel({ profile }: { profile: Profile }) {
       </div>
 
       {editing ? (
-        <ProfileForm profile={profile} mode="self" onSaved={() => setEditing(false)} />
+        <ProfileForm profile={profile} mode="self" onSaved={() => setEditing(false)} initialMilestones={milestones} />
       ) : (
         <ProfileView profile={profile} canManage={false} editableAvatar />
       )}

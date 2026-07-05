@@ -59,6 +59,21 @@ export type Profile = {
   workEmailVerified: boolean;
   workEmailVerificationToken: string | null;
   workEmailVerificationExpiresAt: string | null;
+  /** ISO date strings ("YYYY-MM-DD"), both optional. */
+  joiningDate: string | null;
+  dateOfBirth: string | null;
+};
+
+export type MilestoneCreator = "hr" | "employee";
+
+export type Milestone = {
+  id: string;
+  profileId: string;
+  title: string;
+  milestoneDate: string;
+  createdBy: MilestoneCreator;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type User = {
@@ -108,7 +123,31 @@ type Row = {
   work_email_verified: boolean;
   work_email_verification_token: string | null;
   work_email_verification_expires_at: string | null;
+  joining_date: string | null;
+  date_of_birth: string | null;
 };
+
+type MilestoneRow = {
+  id: string;
+  profile_id: string;
+  title: string;
+  milestone_date: string;
+  created_by: MilestoneCreator;
+  created_at: string;
+  updated_at: string;
+};
+
+function rowToMilestone(r: MilestoneRow): Milestone {
+  return {
+    id: r.id,
+    profileId: r.profile_id,
+    title: r.title,
+    milestoneDate: r.milestone_date,
+    createdBy: r.created_by,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
+}
 
 function rowToProfile(r: Row): Profile {
   return {
@@ -129,6 +168,8 @@ function rowToProfile(r: Row): Profile {
     workEmailVerified: r.work_email_verified ?? false,
     workEmailVerificationToken: r.work_email_verification_token ?? null,
     workEmailVerificationExpiresAt: r.work_email_verification_expires_at ?? null,
+    joiningDate: r.joining_date ?? null,
+    dateOfBirth: r.date_of_birth ?? null,
   };
 }
 
@@ -172,6 +213,27 @@ export async function createSchema(): Promise<void> {
   // Password reset support (self-signup employees + anyone resetting a password).
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires_at TIMESTAMPTZ`;
+
+  // Employment dates — optional, no constraints beyond NULL allowed.
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS joining_date DATE`;
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS date_of_birth DATE`;
+
+  // Milestones. NOTE: the original spec used SERIAL/INTEGER ids to match a
+  // generic schema, but this app's profiles.id is TEXT (app-generated UUID
+  // via randomUUID()), never SERIAL — adapted profile_id (and the
+  // milestone's own id) to TEXT to actually reference the real column.
+  await sql`
+    CREATE TABLE IF NOT EXISTS milestones (
+      id TEXT PRIMARY KEY,
+      profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      milestone_date DATE NOT NULL,
+      created_by TEXT NOT NULL CHECK (created_by IN ('hr', 'employee')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_milestones_profile_id ON milestones(profile_id)`;
 }
 
 const DEMO_USERS: Array<{ email: string; name: string; role: Role; password: string }> = [
@@ -214,7 +276,7 @@ export async function seedProfilesFromJson(): Promise<number> {
   if ((rows[0]?.c ?? 0) > 0) return 0;
 
   const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
-  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt" | "updatedAt" | "avatarUrl">>;
+  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt" | "updatedAt" | "avatarUrl" | "joiningDate" | "dateOfBirth">>;
   let inserted = 0;
   for (const e of seed) {
     const id = randomUUID();
@@ -351,7 +413,7 @@ export async function getDirectoryProfiles(): Promise<Profile[]> {
 }
 
 export async function addProfile(
-  input: Omit<Profile, "id" | "status" | "createdAt" | "updatedAt" | "avatarUrl" | "workEmail" | "workEmailVerified" | "workEmailVerificationToken" | "workEmailVerificationExpiresAt">,
+  input: Omit<Profile, "id" | "status" | "createdAt" | "updatedAt" | "avatarUrl" | "workEmail" | "workEmailVerified" | "workEmailVerificationToken" | "workEmailVerificationExpiresAt" | "joiningDate" | "dateOfBirth">,
 ): Promise<Profile> {
   const id = randomUUID();
   const { rows } = await sql<Row>`
@@ -381,6 +443,7 @@ export async function updateProfile(
     workEmail: "work_email", workEmailVerified: "work_email_verified",
     workEmailVerificationToken: "work_email_verification_token",
     workEmailVerificationExpiresAt: "work_email_verification_expires_at",
+    joiningDate: "joining_date", dateOfBirth: "date_of_birth",
   };
   for (const [k, v] of Object.entries(patch)) {
     if (!(k in map) || v === undefined) continue;
@@ -544,4 +607,39 @@ export async function resetUserPassword(userId: string, passwordHash: string): P
     SET password_hash = ${passwordHash}, password_reset_token = NULL, password_reset_expires_at = NULL
     WHERE id = ${userId}
   `;
+}
+
+/* ─────────── Milestones ─────────── */
+
+export async function getMilestonesByProfileId(profileId: string): Promise<Milestone[]> {
+  const { rows } = await sql<MilestoneRow>`
+    SELECT * FROM milestones WHERE profile_id = ${profileId} ORDER BY milestone_date DESC
+  `;
+  return rows.map(rowToMilestone);
+}
+
+export async function getMilestoneById(id: string): Promise<Milestone | undefined> {
+  const { rows } = await sql<MilestoneRow>`SELECT * FROM milestones WHERE id = ${id} LIMIT 1`;
+  return rows[0] ? rowToMilestone(rows[0]) : undefined;
+}
+
+export async function addMilestone(
+  profileId: string,
+  title: string,
+  milestoneDate: string,
+  createdBy: MilestoneCreator,
+): Promise<Milestone> {
+  const id = randomUUID();
+  const { rows } = await sql<MilestoneRow>`
+    INSERT INTO milestones (id, profile_id, title, milestone_date, created_by)
+    VALUES (${id}, ${profileId}, ${title}, ${milestoneDate}, ${createdBy})
+    RETURNING *
+  `;
+  return rowToMilestone(rows[0]);
+}
+
+/** Caller must already have verified ownership (see /api/milestones/[id]). */
+export async function deleteMilestone(id: string): Promise<boolean> {
+  const { rowCount } = await sql`DELETE FROM milestones WHERE id = ${id}`;
+  return (rowCount ?? 0) > 0;
 }

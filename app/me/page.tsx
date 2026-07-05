@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
-import { getProfileByEmail } from "@/lib/store";
+import { getProfileByEmail, getMilestonesByProfileId } from "@/lib/store";
 import { MePanel } from "@/components/me-panel";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +17,7 @@ export default async function MePage() {
   if (!profile || profile.status !== "approved") {
     redirect("/home");
   }
+  const milestones = await getMilestonesByProfileId(profile.id);
 
   return (
     <div data-theme="dark" className="theme-shell">
@@ -26,7 +27,7 @@ export default async function MePage() {
       <RoleHeader session={session} eyebrow="My profile" employeeApproved />
 
       <section className="relative z-[1] mx-auto max-w-4xl px-s-8 py-s-10">
-        <MePanel profile={profile} />
+        <MePanel profile={profile} milestones={milestones} />
       </section>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   deleteProfile,
   type Status,
 } from "@/lib/store";
-import { isAllowedWorkEmail, WORK_EMAIL_DOMAIN } from "@/lib/domain";
+import { isAllowedWorkEmail, WORK_EMAIL_DOMAIN, isValidDateOfBirth } from "@/lib/domain";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,13 +24,19 @@ export async function PATCH(req: Request, { params }: Params) {
   await requireRole("hr");
   const body = (await req.json()) as Record<string, unknown>;
 
-  const allowed = ["name", "email", "city", "seniority", "yearsExperience", "skills", "projects", "education", "status", "workEmail"] as const;
+  const allowed = ["name", "email", "city", "seniority", "yearsExperience", "skills", "projects", "education", "status", "workEmail", "joiningDate", "dateOfBirth"] as const;
   const patch: Record<string, unknown> = {};
   for (const k of allowed) if (k in body) patch[k] = body[k];
 
   if (patch.status && !["pending", "approved", "rejected"].includes(patch.status as string)) {
     return NextResponse.json({ ok: false, error: "Invalid status." }, { status: 400 });
   }
+
+  if (typeof patch.dateOfBirth === "string" && patch.dateOfBirth && !isValidDateOfBirth(patch.dateOfBirth)) {
+    return NextResponse.json({ ok: false, error: "Date of birth must be at least 16 years ago." }, { status: 400 });
+  }
+  if (patch.joiningDate === "") patch.joiningDate = null;
+  if (patch.dateOfBirth === "") patch.dateOfBirth = null;
 
   // HR is a trusted actor — setting work_email here bypasses employee
   // verification entirely (no email sent, marked verified immediately).

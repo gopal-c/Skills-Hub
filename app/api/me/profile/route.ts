@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { requireRole } from "@/lib/session";
 import { getProfileByEmail, getProfileByWorkEmail, updateProfile } from "@/lib/store";
-import { isAllowedWorkEmail, WORK_EMAIL_DOMAIN } from "@/lib/domain";
+import { isAllowedWorkEmail, WORK_EMAIL_DOMAIN, isValidDateOfBirth } from "@/lib/domain";
 import { sendVerificationEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -20,9 +20,15 @@ export async function PATCH(req: Request) {
   }
 
   const body = (await req.json()) as Record<string, unknown>;
-  const allowed = ["name", "city", "seniority", "yearsExperience", "skills", "projects", "education"] as const;
+  const allowed = ["name", "city", "seniority", "yearsExperience", "skills", "projects", "education", "joiningDate", "dateOfBirth"] as const;
   const patch: Record<string, unknown> = {};
   for (const k of allowed) if (k in body) patch[k] = body[k];
+
+  if (typeof patch.dateOfBirth === "string" && patch.dateOfBirth && !isValidDateOfBirth(patch.dateOfBirth)) {
+    return NextResponse.json({ ok: false, error: "Date of birth must be at least 16 years ago." }, { status: 400 });
+  }
+  if (patch.joiningDate === "") patch.joiningDate = null;
+  if (patch.dateOfBirth === "") patch.dateOfBirth = null;
 
   let verificationSent = false;
 

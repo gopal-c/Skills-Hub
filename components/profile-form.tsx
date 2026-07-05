@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HrResumeSection } from "@/components/hr-resume-section";
-import type { Profile, Seniority, Proficiency, Status, Skill, Project, Education } from "@/lib/store";
+import { MilestonesPanel } from "@/components/milestones-panel";
+import { maxDateOfBirth } from "@/lib/domain";
+import type { Profile, Seniority, Proficiency, Status, Skill, Project, Education, Milestone } from "@/lib/store";
 
 type Props = {
   profile: Profile;
@@ -24,12 +26,13 @@ type Props = {
    *  "self" = employee editing their own profile from /me. */
   mode: "review" | "edit" | "self";
   onSaved?: () => void;
+  initialMilestones?: Milestone[];
 };
 
 const SENIORITIES: Seniority[]   = ["junior", "mid", "senior", "lead"];
 const PROFICIENCIES: Proficiency[] = ["beginner", "intermediate", "advanced", "expert"];
 
-export function ProfileForm({ profile, mode, onSaved }: Props) {
+export function ProfileForm({ profile, mode, onSaved, initialMilestones = [] }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -42,6 +45,8 @@ export function ProfileForm({ profile, mode, onSaved }: Props) {
   const [projects, setProjects]               = useState<Project[]>(profile.projects);
   const [education, setEducation]             = useState<Education[]>(profile.education);
   const [workEmail, setWorkEmail]             = useState(profile.workEmail ?? "");
+  const [joiningDate, setJoiningDate]         = useState(profile.joiningDate ?? "");
+  const [dateOfBirth, setDateOfBirth]         = useState(profile.dateOfBirth ?? "");
 
   const workEmailLocked = mode === "self" && profile.workEmailVerified;
 
@@ -49,6 +54,8 @@ export function ProfileForm({ profile, mode, onSaved }: Props) {
     const patch: Record<string, unknown> = {
       name, city, seniority, yearsExperience,
       skills, projects, education,
+      joiningDate: joiningDate || null,
+      dateOfBirth: dateOfBirth || null,
       ...extra,
     };
     if (mode !== "self") patch.email = email;
@@ -147,8 +154,44 @@ export function ProfileForm({ profile, mode, onSaved }: Props) {
         </CardContent>
       </Card>
 
+      {/* Employment Details */}
+      <Card>
+        <CardHeader><CardTitle>Employment Details</CardTitle></CardHeader>
+        <CardContent className="grid gap-s-4 md:grid-cols-2">
+          <div className="space-y-s-2">
+            <Label htmlFor="joining-date">Joining Date</Label>
+            <Input
+              id="joining-date"
+              type="date"
+              value={joiningDate}
+              onChange={(e) => setJoiningDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-s-2">
+            <Label htmlFor="dob">Date of Birth</Label>
+            <Input
+              id="dob"
+              type="date"
+              value={dateOfBirth}
+              max={maxDateOfBirth()}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+            />
+            <p className="text-[12px] text-fg-2">Must be at least 16 years ago.</p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Resume — HR only; employees use /upload for their own re-uploads */}
       {mode !== "self" && <HrResumeSection profile={profile} />}
+
+      {/* Milestones & Achievements */}
+      <MilestonesPanel
+        profileId={profile.id}
+        initialMilestones={initialMilestones}
+        viewerRole={mode === "self" ? "employee" : "hr"}
+        heading={mode === "self" ? "My Milestones & Achievements" : "Milestones & Achievements"}
+        emptyText={mode === "self" ? "No milestones yet — add your first achievement." : "No milestones recorded yet."}
+      />
 
       {/* Skills */}
       <Card>

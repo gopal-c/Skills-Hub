@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
-import { getProfile } from "@/lib/store";
+import { getProfile, getMilestonesByProfileId } from "@/lib/store";
 import { ProfileForm } from "@/components/profile-form";
 import { Badge } from "@/components/ui/badge";
 
@@ -18,6 +18,7 @@ export default async function ReviewProfilePage({ params }: { params: { id: stri
   const session = await requireRole("hr");
   const profile = await getProfile(params.id);
   if (!profile) notFound();
+  const milestones = await getMilestonesByProfileId(profile.id);
 
   return (
     <div data-theme="light" className="theme-shell">
@@ -37,7 +38,7 @@ export default async function ReviewProfilePage({ params }: { params: { id: stri
         </div>
 
         <div className="mt-s-8">
-          <ProfileForm key={profile.updatedAt} profile={profile} mode="review" />
+          <ProfileForm key={profile.updatedAt} profile={profile} mode="review" initialMilestones={milestones} />
         </div>
       </section>
     </div>
