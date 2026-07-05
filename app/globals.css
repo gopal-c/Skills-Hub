@@ -1268,3 +1268,203 @@
 [data-theme="dark"] [data-signout]:hover:not(:disabled) {
   color: var(--ink-800);
 }
+
+/* ============================================================
+   AI RESUME UPLOAD PANEL — components/ai-resume-upload-panel.tsx
+   Shared by the HR review/edit form and /onboard. Deliberately NOT
+   scoped under .upload-v2 (that scope only exists inside pages that
+   opt into the dark employee shell) — this panel needs to render
+   correctly wherever it's dropped, light theme or dark. Every color
+   below is one of the existing brand/ink tokens from :root — no new
+   hues, just an extra elevation step + a single indigo accent bar.
+   ============================================================ */
+
+.ai-resume-panel {
+  position: relative;
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border-hairline);
+  border-top: 2px solid var(--brand-indigo-deep);
+  background: linear-gradient(180deg, var(--brand-indigo-soft) 0%, var(--ink-0) 55%);
+  box-shadow: var(--shadow-2);
+  padding: var(--s-5) var(--s-6) var(--s-6);
+}
+
+.ai-resume-panel .ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+.ai-resume-panel .ai-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font: var(--t-h4);
+  font-weight: 600;
+  color: var(--ink-800);
+}
+.ai-resume-panel .ai-title svg { color: var(--brand-indigo-deep); flex-shrink: 0; }
+.ai-resume-panel .ai-badge {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  font: var(--t-mono-s);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--brand-indigo-deep);
+  background: rgba(139, 123, 232, 0.10);
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+}
+.ai-resume-panel .ai-desc {
+  font: var(--t-body-s);
+  color: var(--ink-600);
+  margin: 0 0 var(--s-4);
+  max-width: 54ch;
+}
+
+/* Resume-on-file row */
+.ai-resume-panel .ai-on-file {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font: var(--t-body-s);
+  color: var(--ink-600);
+  margin-bottom: var(--s-4);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px dashed var(--border-hairline);
+}
+.ai-resume-panel .ai-on-file svg { color: var(--ink-400); flex-shrink: 0; }
+.ai-resume-panel .ai-replace-link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font: var(--t-label);
+  color: var(--brand-indigo-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Dropzone */
+.ai-resume-panel .ai-dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  text-align: center;
+  padding: var(--s-8) var(--s-5);
+  border-radius: var(--r-lg);
+  border: 1.5px dashed rgba(139, 123, 232, 0.3);
+  background: var(--ink-0);
+  cursor: pointer;
+  transition: all var(--t-base) var(--ease-out);
+}
+.ai-resume-panel .ai-dropzone:hover,
+.ai-resume-panel .ai-dropzone:focus-within {
+  border-color: var(--brand-indigo-deep);
+}
+.ai-resume-panel .ai-dropzone.dragging {
+  border-color: var(--brand-indigo-deep);
+  border-style: solid;
+  background: var(--brand-indigo-soft);
+}
+.ai-resume-panel .ai-dropzone input[type="file"] { display: none; }
+.ai-resume-panel .ai-dz-icon { color: var(--ink-400); transition: color var(--t-base) var(--ease-out); }
+.ai-resume-panel .ai-dropzone:hover .ai-dz-icon,
+.ai-resume-panel .ai-dropzone.dragging .ai-dz-icon { color: var(--brand-indigo-deep); }
+.ai-resume-panel .ai-dz-text { font: var(--t-label); color: var(--ink-800); }
+.ai-resume-panel .ai-dz-text b { color: var(--brand-indigo-deep); font-weight: 600; }
+.ai-resume-panel .ai-dz-hint { font: var(--t-caption); color: var(--ink-400); }
+
+/* File-selected row (before submit) */
+.ai-resume-panel .ai-file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-hairline);
+  background: var(--ink-0);
+}
+.ai-resume-panel .ai-file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  flex-shrink: 0;
+  background: var(--brand-indigo-soft);
+  color: var(--brand-indigo-deep);
+}
+.ai-resume-panel .ai-file-name { font: var(--t-label); color: var(--ink-800); }
+.ai-resume-panel .ai-file-meta { font: var(--t-mono-s); color: var(--ink-600); margin-top: 2px; }
+.ai-resume-panel .ai-file-clear {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-600);
+  transition: all var(--t-fast) var(--ease-out);
+}
+.ai-resume-panel .ai-file-clear:hover { background: var(--ink-100); color: var(--brand-coral-deep); }
+
+/* Loading state — panel + accent bar stay put, only inner content pulses */
+.ai-resume-panel .ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-8) var(--s-5);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-hairline);
+  background: var(--ink-0);
+  text-align: center;
+}
+.ai-resume-panel .ai-loading-text { font: var(--t-label); color: var(--ink-800); }
+
+/* Success state */
+.ai-resume-panel .ai-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  padding: var(--s-8) var(--s-5);
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(124, 211, 197, 0.4);
+  background: var(--brand-teal-soft);
+  text-align: center;
+}
+.ai-resume-panel .ai-success svg { color: var(--brand-teal-deep); }
+.ai-resume-panel .ai-success-text { font: var(--t-label); color: var(--ink-800); font-weight: 500; }
+
+/* Submit button — same indigo-deep primary treatment used across the app */
+.ai-resume-panel .ai-submit-btn {
+  margin-top: var(--s-4);
+  width: 100%;
+  background: var(--brand-indigo-deep);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  height: 44px;
+  font: var(--t-label);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--t-base) var(--ease-out);
+}
+.ai-resume-panel .ai-submit-btn:hover:not(:disabled) { background: var(--brand-indigo-press); }
+.ai-resume-panel .ai-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
