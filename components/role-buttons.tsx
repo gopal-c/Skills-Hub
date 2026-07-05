@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { LoginModal } from "@/components/login-modal";
 
 type Picked = "hr" | "employee" | null;
@@ -64,6 +65,13 @@ export function RoleButtons() {
           </span>
         </button>
       </section>
+
+      <p className="relative z-10 mx-auto -mt-s-12 mb-s-16 max-w-3xl px-s-8 text-center text-[13px] text-fg-on-dark-2">
+        New employee?{" "}
+        <Link href="/signup" className="underline hover:text-fg-on-dark">Sign up</Link>
+        <span className="mx-s-2">&middot;</span>
+        <Link href="/forgot-password" className="underline hover:text-fg-on-dark">Forgot password?</Link>
+      </p>
 
       <LoginModal
         open={open}

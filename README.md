@@ -23,6 +23,35 @@ Next.js 14 · TypeScript · Tailwind · shadcn/ui · Postgres (Neon) · Groq (Ll
 
 Built May 15–16, 2026.
 
+## Employee self-signup
+
+Employees at `@valueaddsofttech.com` can create their own account instead of waiting for
+HR to onboard them from a resume:
+
+1. **`/signup`** — name, work email (must end in `@valueaddsofttech.com`), password.
+2. A verification email is sent (see env vars below). Clicking the link confirms the
+   email and flips the account to "pending HR approval."
+3. **`/review`** — self-signups only show up here once their email is verified. Unverified
+   rows are hidden so HR isn't asked to approve an account nobody's confirmed yet.
+4. Once HR approves, the employee can sign in and lands on `/me`. Logging in before
+   verification/approval redirects to `/pending-approval` instead.
+5. From `/me`, employees can edit their own profile fields. Their **work email is locked
+   once verified** — changing it requires HR to update it from the review/edit screen
+   (HR changes bypass verification entirely, since HR is a trusted actor).
+6. Forgot a password? `/forgot-password` → email link → `/reset-password`.
+
+### New environment variables
+
+| Var | Purpose |
+|---|---|
+| `APP_URL` | Base URL used to build verification / reset links in emails (e.g. `http://localhost:3000` in dev). |
+| `GMAIL_USER` | Gmail address emails are sent from. |
+| `GMAIL_APP_PASSWORD` | A Google [App Password](https://myaccount.google.com/apppasswords) for that account — not your regular Gmail password. |
+
+If these aren't set, signup/verification/reset still work functionally (accounts and
+tokens are created), but no email is sent — the API responds with `emailSent: false`
+so the UI can show a "resend" option instead of crashing.
+
 
 ## Getting Started
 
