@@ -53,6 +53,11 @@ export type Profile = {
   avatarUrl: string | null;
   status: Status;
   createdAt: string;
+  /** Work email used for self-signup verification. Null for HR-onboarded/resume-only profiles. */
+  workEmail: string | null;
+  workEmailVerified: boolean;
+  workEmailVerificationToken: string | null;
+  workEmailVerificationExpiresAt: string | null;
 };
 
 export type User = {
@@ -70,6 +75,8 @@ type UserRow = {
   name: string;
   role: Role;
   created_at: string;
+  password_reset_token?: string | null;
+  password_reset_expires_at?: string | null;
 };
 
 function userRowToUser(r: UserRow): User {
@@ -95,6 +102,10 @@ type Row = {
   education: Education[] | null;
   avatar_url: string | null;
   created_at: string;
+  work_email: string | null;
+  work_email_verified: boolean;
+  work_email_verification_token: string | null;
+  work_email_verification_expires_at: string | null;
 };
 
 function rowToProfile(r: Row): Profile {
@@ -111,6 +122,10 @@ function rowToProfile(r: Row): Profile {
     education: r.education ?? [],
     avatarUrl: r.avatar_url ?? null,
     createdAt: r.created_at,
+    workEmail: r.work_email ?? null,
+    workEmailVerified: r.work_email_verified ?? false,
+    workEmailVerificationToken: r.work_email_verification_token ?? null,
+    workEmailVerificationExpiresAt: r.work_email_verification_expires_at ?? null,
   };
 }
 
@@ -130,6 +145,16 @@ export async function createSchema(): Promise<void> {
   `;
   // Backfill for tables created before the avatar_url column existed.
   await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT`;
+
+  // Self-signup + work-email verification columns.
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS work_email TEXT`;
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS work_email_verified BOOLEAN NOT NULL DEFAULT FALSE`;
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS work_email_verification_token TEXT`;
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS work_email_verification_expires_at TIMESTAMPTZ`;
+  // Unique index on work_email (partial — many rows have NULL work_email, which
+  // Postgres allows any number of; only non-null values must be unique).
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS profiles_work_email_key ON profiles (work_email) WHERE work_email IS NOT NULL`;
+
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -140,6 +165,9 @@ export async function createSchema(): Promise<void> {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+  // Password reset support (self-signup employees + anyone resetting a password).
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires_at TIMESTAMPTZ`;
 }
 
 const DEMO_USERS: Array<{ email: string; name: string; role: Role; password: string }> = [
@@ -282,10 +310,17 @@ export async function getApprovedProfiles(): Promise<Profile[]> {
   return rows.map(rowToProfile);
 }
 
+/**
+ * Pending profiles awaiting HR review. Self-signups whose work email hasn't
+ * been verified yet are excluded — no point bothering HR with a row nobody
+ * can act on until the employee confirms their inbox.
+ */
 export async function getPendingProfiles(): Promise<Profile[]> {
   await ensureSeeded();
   const { rows } = await sql<Row>`
-    SELECT * FROM profiles WHERE status = 'pending' ORDER BY created_at DESC
+    SELECT * FROM profiles
+    WHERE status = 'pending' AND (work_email IS NULL OR work_email_verified = TRUE)
+    ORDER BY created_at DESC
   `;
   return rows.map(rowToProfile);
 }
@@ -302,7 +337,7 @@ export async function getDirectoryProfiles(): Promise<Profile[]> {
 }
 
 export async function addProfile(
-  input: Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl">,
+  input: Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl" | "workEmail" | "workEmailVerified" | "workEmailVerificationToken" | "workEmailVerificationExpiresAt">,
 ): Promise<Profile> {
   const id = randomUUID();
   const { rows } = await sql<Row>`
@@ -329,6 +364,9 @@ export async function updateProfile(
     name: "name", email: "email", city: "city", seniority: "seniority",
     yearsExperience: "years_experience", status: "status",
     skills: "skills", projects: "projects", education: "education",
+    workEmail: "work_email", workEmailVerified: "work_email_verified",
+    workEmailVerificationToken: "work_email_verification_token",
+    workEmailVerificationExpiresAt: "work_email_verification_expires_at",
   };
   for (const [k, v] of Object.entries(patch)) {
     if (!(k in map) || v === undefined) continue;
@@ -370,4 +408,129 @@ export async function setProfileStatus(
 export async function deleteProfile(id: string): Promise<boolean> {
   const { rowCount } = await sql`DELETE FROM profiles WHERE id = ${id}`;
   return (rowCount ?? 0) > 0;
+}
+
+/* ─────────── Self-signup + work-email verification ─────────── */
+
+export const WORK_EMAIL_DOMAIN = "@valueaddsofttech.com";
+
+export function isAllowedWorkEmail(email: string): boolean {
+  return email.trim().toLowerCase().endsWith(WORK_EMAIL_DOMAIN);
+}
+
+/**
+ * Upsert a user account for self-signup. If a users row already exists for
+ * this email (e.g. an "invited" employee created earlier during HR
+ * onboarding, still on the Demo@123 password), overwrite its password hash
+ * and name rather than skipping — the employee is claiming the account.
+ */
+export async function upsertSelfSignupUser(
+  email: string,
+  name: string,
+  passwordHash: string,
+): Promise<User> {
+  const id = randomUUID();
+  const { rows } = await sql<UserRow>`
+    INSERT INTO users (id, email, password_hash, name, role)
+    VALUES (${id}, ${email.toLowerCase()}, ${passwordHash}, ${name}, 'employee')
+    ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, name = EXCLUDED.name
+    RETURNING *
+  `;
+  return userRowToUser(rows[0]);
+}
+
+/**
+ * Create (or refresh) the pending profile behind a self-signup attempt.
+ * Sets email = workEmail so the existing getProfileByEmail()-based session
+ * plumbing (/me, /upload) keeps working without changes.
+ */
+export async function createOrRefreshSelfSignupProfile(
+  workEmail: string,
+  name: string,
+  token: string,
+  expiresAt: string,
+): Promise<Profile> {
+  const existing = await getProfileByEmail(workEmail);
+  if (existing) {
+    const updated = await updateProfile(existing.id, {
+      name,
+      email: workEmail,
+      workEmail,
+      workEmailVerified: false,
+      workEmailVerificationToken: token,
+      workEmailVerificationExpiresAt: expiresAt,
+      status: "pending",
+    });
+    return updated!;
+  }
+
+  const id = randomUUID();
+  const { rows } = await sql<Row>`
+    INSERT INTO profiles (
+      id, status, name, email, city, seniority, years_experience,
+      skills, projects, education,
+      work_email, work_email_verified, work_email_verification_token, work_email_verification_expires_at
+    )
+    VALUES (
+      ${id}, 'pending', ${name}, ${workEmail}, '', 'junior', 0,
+      '[]'::jsonb, '[]'::jsonb, '[]'::jsonb,
+      ${workEmail}, FALSE, ${token}, ${expiresAt}
+    )
+    RETURNING *
+  `;
+  return rowToProfile(rows[0]);
+}
+
+export async function getProfileByWorkEmailToken(token: string): Promise<Profile | undefined> {
+  const { rows } = await sql<Row>`
+    SELECT * FROM profiles
+    WHERE work_email_verification_token = ${token}
+      AND work_email_verification_expires_at > NOW()
+    LIMIT 1
+  `;
+  return rows[0] ? rowToProfile(rows[0]) : undefined;
+}
+
+export async function verifyWorkEmail(profileId: string): Promise<Profile | undefined> {
+  return updateProfile(profileId, {
+    workEmailVerified: true,
+    workEmailVerificationToken: null,
+    workEmailVerificationExpiresAt: null,
+  });
+}
+
+/* ─────────── Password reset ─────────── */
+
+export async function getUserById(id: string): Promise<User | undefined> {
+  const { rows } = await sql<UserRow>`SELECT * FROM users WHERE id = ${id} LIMIT 1`;
+  return rows[0] ? userRowToUser(rows[0]) : undefined;
+}
+
+export async function setPasswordResetToken(
+  email: string,
+  token: string,
+  expiresAt: string,
+): Promise<boolean> {
+  const { rowCount } = await sql`
+    UPDATE users SET password_reset_token = ${token}, password_reset_expires_at = ${expiresAt}
+    WHERE email = ${email.toLowerCase()}
+  `;
+  return (rowCount ?? 0) > 0;
+}
+
+export async function getUserByPasswordResetToken(token: string): Promise<User | undefined> {
+  const { rows } = await sql<UserRow>`
+    SELECT * FROM users
+    WHERE password_reset_token = ${token} AND password_reset_expires_at > NOW()
+    LIMIT 1
+  `;
+  return rows[0] ? userRowToUser(rows[0]) : undefined;
+}
+
+export async function resetUserPassword(userId: string, passwordHash: string): Promise<void> {
+  await sql`
+    UPDATE users
+    SET password_hash = ${passwordHash}, password_reset_token = NULL, password_reset_expires_at = NULL
+    WHERE id = ${userId}
+  `;
 }

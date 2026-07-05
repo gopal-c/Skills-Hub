@@ -34,7 +34,9 @@
       "Bash(curl -sI \"https://skills-hub.vercel.app/\")",
       "Bash(curl -sI \"https://skills-hub-gopal-chavan-s-projects.vercel.app/\")",
       "Bash(curl -sI \"https://skills-hub-EWzsEhUKYWHpSG546mocAEJVo2JL-gopal-chavan-s-projects.vercel.app/\")",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(grep -rn \"review/\\\\${\" app/employees/\\\\[id\\\\]/page.tsx components/profile-view.tsx)",
+      "Bash(npx tsc *)"
     ]
   }
 }

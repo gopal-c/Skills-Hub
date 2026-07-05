@@ -32,11 +32,13 @@ yarn-error.log*
 .vercel
 
 # design system handoffs (reference only — extracted from Claude Design)
-/.handoff
-/.handoff*
+# /.handoff
+# /.handoff*
+/.handoff*/hackathon-skills-hub/chats
+/.handoff*/hackathon-skills-hub/project
 
 # claude code local settings
-/.claude
+# /.claude
 
 # build logs
 build.log
