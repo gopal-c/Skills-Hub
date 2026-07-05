@@ -37,7 +37,7 @@ export default async function ReviewProfilePage({ params }: { params: { id: stri
         </div>
 
         <div className="mt-s-8">
-          <ProfileForm profile={profile} mode="review" />
+          <ProfileForm key={profile.updatedAt} profile={profile} mode="review" />
         </div>
       </section>
     </div>

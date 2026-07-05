@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getProfileByWorkEmailToken, verifyWorkEmail } from "@/lib/store";
+import { getProfileByWorkEmailToken, verifyWorkEmail, hasResumeData } from "@/lib/store";
+import { signPreApprovalUploadToken } from "@/lib/auth";
 import { ResendForm } from "./resend-form";
+import { VerifyUploadPanel } from "./upload-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +17,7 @@ export default async function VerifyEmailPage({
   if (profile) {
     await verifyWorkEmail(profile.id);
   }
+  const uploadToken = profile ? await signPreApprovalUploadToken(profile.id) : null;
 
   return (
     <div data-theme="dark" className="theme-shell">
@@ -30,16 +33,22 @@ export default async function VerifyEmailPage({
 
       <main className="upload-v2 relative z-[1] mx-auto max-w-[520px] px-s-8 pb-s-20 pt-s-8">
         {profile ? (
-          <section className="form-card text-center">
-            <h2>Email verified</h2>
-            <p className="lede">
-              Thanks, {profile.name}. Your account is now waiting on HR approval — you&rsquo;ll be able
-              to sign in once it&rsquo;s reviewed.
-            </p>
-            <div className="form-actions">
-              <Link href="/" className="btn-primary">Back to home</Link>
-            </div>
-          </section>
+          <>
+            <section className="form-card text-center">
+              <h2>Email verified</h2>
+              <p className="lede">
+                Thanks, {profile.name}. Your account is now waiting on HR approval — you&rsquo;ll be able
+                to sign in once it&rsquo;s reviewed.
+              </p>
+              <div className="form-actions">
+                <Link href="/" className="btn-primary">Back to home</Link>
+              </div>
+            </section>
+
+            {uploadToken && (
+              <VerifyUploadPanel token={uploadToken} alreadyUploaded={hasResumeData(profile)} />
+            )}
+          </>
         ) : (
           <section className="form-card text-center">
             <h2>Link expired or invalid</h2>

@@ -65,3 +65,39 @@ export async function verifySession(token: string | undefined | null): Promise<S
     return null;
   }
 }
+
+/**
+ * Pre-approval upload token — issued once on the /verify-email success
+ * screen so a verified-but-not-yet-approved employee can upload a resume
+ * without a full login session.
+ *
+ * This is intentionally NOT a session: it carries no `role` claim, so
+ * verifySession() above will reject it outright, and requireRole()/
+ * requireSession() never accept it. It grants exactly one capability
+ * (write a resume extraction to one specific profile via the
+ * /api/verify-upload route) and nothing else — no access to /me, /upload,
+ * or any authenticated page. 7-day expiry, matching the review-queue
+ * window a new signup might sit in before HR gets to it.
+ */
+export type PreApprovalUploadPayload = { profileId: string };
+
+export async function signPreApprovalUploadToken(profileId: string): Promise<string> {
+  return await new SignJWT({ scope: "pre-approval-upload" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(profileId)
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(getSecret());
+}
+
+export async function verifyPreApprovalUploadToken(token: string | undefined | null): Promise<string | null> {
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, getSecret(), { algorithms: ["HS256"] });
+    if (payload.scope !== "pre-approval-upload") return null;
+    if (typeof payload.sub !== "string") return null;
+    return payload.sub; // profileId
+  } catch {
+    return null;
+  }
+}

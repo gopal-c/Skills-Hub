@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HrResumeSection } from "@/components/hr-resume-section";
 import type { Profile, Seniority, Proficiency, Status, Skill, Project, Education } from "@/lib/store";
 
 type Props = {
@@ -145,6 +146,9 @@ export function ProfileForm({ profile, mode, onSaved }: Props) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Resume — HR only; employees use /upload for their own re-uploads */}
+      {mode !== "self" && <HrResumeSection profile={profile} />}
 
       {/* Skills */}
       <Card>

@@ -53,6 +53,7 @@ export type Profile = {
   avatarUrl: string | null;
   status: Status;
   createdAt: string;
+  updatedAt: string;
   /** Work email used for self-signup verification. Null for HR-onboarded/resume-only profiles. */
   workEmail: string | null;
   workEmailVerified: boolean;
@@ -102,6 +103,7 @@ type Row = {
   education: Education[] | null;
   avatar_url: string | null;
   created_at: string;
+  updated_at: string;
   work_email: string | null;
   work_email_verified: boolean;
   work_email_verification_token: string | null;
@@ -122,6 +124,7 @@ function rowToProfile(r: Row): Profile {
     education: r.education ?? [],
     avatarUrl: r.avatar_url ?? null,
     createdAt: r.created_at,
+    updatedAt: r.updated_at ?? r.created_at,
     workEmail: r.work_email ?? null,
     workEmailVerified: r.work_email_verified ?? false,
     workEmailVerificationToken: r.work_email_verification_token ?? null,
@@ -145,6 +148,7 @@ export async function createSchema(): Promise<void> {
   `;
   // Backfill for tables created before the avatar_url column existed.
   await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT`;
+  await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
 
   // Self-signup + work-email verification columns.
   await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS work_email TEXT`;
@@ -210,7 +214,7 @@ export async function seedProfilesFromJson(): Promise<number> {
   if ((rows[0]?.c ?? 0) > 0) return 0;
 
   const raw = readFileSync(join(process.cwd(), "seed", "employees.json"), "utf8");
-  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl">>;
+  const seed = JSON.parse(raw) as Array<Omit<Profile, "id" | "status" | "createdAt" | "updatedAt" | "avatarUrl">>;
   let inserted = 0;
   for (const e of seed) {
     const id = randomUUID();
@@ -302,6 +306,8 @@ export async function getProfileByEmail(email: string): Promise<Profile | undefi
   return rows[0] ? rowToProfile(rows[0]) : undefined;
 }
 
+export { hasResumeData } from "./domain";
+
 export async function getProfileByWorkEmail(workEmail: string): Promise<Profile | undefined> {
   await ensureSeeded();
   const { rows } = await sql<Row>`
@@ -345,7 +351,7 @@ export async function getDirectoryProfiles(): Promise<Profile[]> {
 }
 
 export async function addProfile(
-  input: Omit<Profile, "id" | "status" | "createdAt" | "avatarUrl" | "workEmail" | "workEmailVerified" | "workEmailVerificationToken" | "workEmailVerificationExpiresAt">,
+  input: Omit<Profile, "id" | "status" | "createdAt" | "updatedAt" | "avatarUrl" | "workEmail" | "workEmailVerified" | "workEmailVerificationToken" | "workEmailVerificationExpiresAt">,
 ): Promise<Profile> {
   const id = randomUUID();
   const { rows } = await sql<Row>`
@@ -363,7 +369,7 @@ export async function addProfile(
 
 export async function updateProfile(
   id: string,
-  patch: Partial<Omit<Profile, "id" | "createdAt">>,
+  patch: Partial<Omit<Profile, "id" | "createdAt" | "updatedAt">>,
 ): Promise<Profile | undefined> {
   // Hand-built dynamic update — small enough to stay readable.
   const sets: string[] = [];
@@ -383,6 +389,7 @@ export async function updateProfile(
     sets.push(`${col} = $${values.length}${["skills","projects","education"].includes(k) ? "::jsonb" : ""}`);
   }
   if (sets.length === 0) return getProfile(id);
+  sets.push("updated_at = NOW()"); // touch on every write — no placeholder needed
   values.push(id);
   const { rows } = await sql.query<Row>(
     `UPDATE profiles SET ${sets.join(", ")} WHERE id = $${values.length} RETURNING *`,

@@ -101,10 +101,16 @@ function coerce(raw: unknown): ExtractedProfile | null {
   return { name, email, city, seniority, yearsExperience, skills, projects, education };
 }
 
+/** Enforced across every upload entry point — /upload, verify-email, and HR's onboarding/edit uploads. */
+export const MAX_RESUME_BYTES = 10 * 1024 * 1024; // 10 MB
+
 /** Extracts a structured profile from a resume PDF. Throws ExtractError on failure. */
 export async function extractProfileFromPdf(buffer: Uint8Array | Buffer): Promise<ExtractedProfile> {
   if (!process.env.GROQ_API_KEY) {
     throw new ExtractError("GROQ_API_KEY not configured.", 503);
+  }
+  if (buffer.length > MAX_RESUME_BYTES) {
+    throw new ExtractError("That PDF is too large — we support up to 10 MB.", 413);
   }
 
   // 1. PDF → text
