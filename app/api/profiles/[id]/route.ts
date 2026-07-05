@@ -6,6 +6,7 @@ import {
   deleteProfile,
   type Status,
 } from "@/lib/store";
+import { isAllowedWorkEmail, WORK_EMAIL_DOMAIN } from "@/lib/domain";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,12 +23,28 @@ export async function PATCH(req: Request, { params }: Params) {
   await requireRole("hr");
   const body = (await req.json()) as Record<string, unknown>;
 
-  const allowed = ["name", "email", "city", "seniority", "yearsExperience", "skills", "projects", "education", "status"] as const;
+  const allowed = ["name", "email", "city", "seniority", "yearsExperience", "skills", "projects", "education", "status", "workEmail"] as const;
   const patch: Record<string, unknown> = {};
   for (const k of allowed) if (k in body) patch[k] = body[k];
 
   if (patch.status && !["pending", "approved", "rejected"].includes(patch.status as string)) {
     return NextResponse.json({ ok: false, error: "Invalid status." }, { status: 400 });
+  }
+
+  // HR is a trusted actor — setting work_email here bypasses employee
+  // verification entirely (no email sent, marked verified immediately).
+  if (typeof patch.workEmail === "string") {
+    const workEmail = patch.workEmail.trim().toLowerCase();
+    if (workEmail && !isAllowedWorkEmail(workEmail)) {
+      return NextResponse.json(
+        { ok: false, error: `Work email must end in ${WORK_EMAIL_DOMAIN}.` },
+        { status: 400 },
+      );
+    }
+    patch.workEmail = workEmail || null;
+    patch.workEmailVerified = !!workEmail;
+    patch.workEmailVerificationToken = null;
+    patch.workEmailVerificationExpiresAt = null;
   }
 
   const updated = await updateProfile(params.id, patch as Partial<{ status: Status }>);

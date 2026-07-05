@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { UserCircle2, Eye } from "lucide-react";
+import { UserCircle2 } from "lucide-react";
 import { requireRole } from "@/lib/session";
 import { RoleHeader } from "@/components/role-header";
 import { getProfileByEmail } from "@/lib/store";
-import { ProfileView } from "@/components/profile-view";
+import { MePanel } from "@/components/me-panel";
 import { buttonVariants } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -26,17 +26,7 @@ export default async function MePage() {
       <RoleHeader session={session} eyebrow="My profile" />
 
       <section className="relative z-[1] mx-auto max-w-4xl px-s-8 py-s-10">
-        {profile ? (
-          <>
-            <div className="mb-s-6 flex items-center gap-s-3 rounded-md border border-border-hairline bg-indigo-soft px-s-4 py-s-3 text-[13px] text-indigo-press">
-              <Eye className="size-4 flex-shrink-0" />
-              <span>This is how others see your profile.</span>
-            </div>
-            <ProfileView profile={profile} canManage={false} editableAvatar />
-          </>
-        ) : (
-          <EmptyProfileState />
-        )}
+        {profile ? <MePanel profile={profile} /> : <EmptyProfileState />}
       </section>
     </div>
   );

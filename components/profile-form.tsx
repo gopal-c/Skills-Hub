@@ -19,13 +19,16 @@ import type { Profile, Seniority, Proficiency, Status, Skill, Project, Education
 
 type Props = {
   profile: Profile;
-  mode: "review" | "edit";
+  /** "review" = HR reviewing a pending profile. "edit" = unused legacy HR edit.
+   *  "self" = employee editing their own profile from /me. */
+  mode: "review" | "edit" | "self";
+  onSaved?: () => void;
 };
 
 const SENIORITIES: Seniority[]   = ["junior", "mid", "senior", "lead"];
 const PROFICIENCIES: Proficiency[] = ["beginner", "intermediate", "advanced", "expert"];
 
-export function ProfileForm({ profile, mode }: Props) {
+export function ProfileForm({ profile, mode, onSaved }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -37,19 +40,26 @@ export function ProfileForm({ profile, mode }: Props) {
   const [skills, setSkills]                   = useState<Skill[]>(profile.skills);
   const [projects, setProjects]               = useState<Project[]>(profile.projects);
   const [education, setEducation]             = useState<Education[]>(profile.education);
+  const [workEmail, setWorkEmail]             = useState(profile.workEmail ?? "");
+
+  const workEmailLocked = mode === "self" && profile.workEmailVerified;
 
   function buildPatch(extra: Partial<{ status: Status }> = {}) {
-    return {
-      name, email, city, seniority, yearsExperience,
+    const patch: Record<string, unknown> = {
+      name, city, seniority, yearsExperience,
       skills, projects, education,
       ...extra,
     };
+    if (mode !== "self") patch.email = email;
+    if (mode === "self" || mode === "review") patch.workEmail = workEmail;
+    return patch;
   }
 
   function submit(patch: Record<string, unknown>, successMessage: string, target?: string) {
+    const url = mode === "self" ? "/api/me/profile" : `/api/profiles/${profile.id}`;
     startTransition(async () => {
       try {
-        const res = await fetch(`/api/profiles/${profile.id}`, {
+        const res = await fetch(url, {
           method: "PATCH",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(patch),
@@ -59,8 +69,13 @@ export function ProfileForm({ profile, mode }: Props) {
           toast.error(data.error ?? "Couldn't save.");
           return;
         }
-        toast.success(successMessage);
+        toast.success(data.verificationSent === false && patch.workEmail
+          ? `${successMessage} Couldn't send a verification email — try again from your profile.`
+          : data.verificationSent
+            ? `${successMessage} We sent a new verification link to ${patch.workEmail}.`
+            : successMessage);
         if (target) router.push(target);
+        onSaved?.();
         router.refresh();
       } catch {
         toast.error("Network error — try again.");
@@ -78,10 +93,31 @@ export function ProfileForm({ profile, mode }: Props) {
             <Label htmlFor="name">Name</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div className="space-y-s-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
+          {mode !== "self" && (
+            <div className="space-y-s-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+          )}
+          {(mode === "review" || mode === "self") && (
+            <div className="space-y-s-2">
+              <Label htmlFor="work-email">Work email</Label>
+              <Input
+                id="work-email"
+                type="email"
+                value={workEmail}
+                disabled={workEmailLocked}
+                onChange={(e) => setWorkEmail(e.target.value)}
+                placeholder="name@valueaddsofttech.com"
+              />
+              {workEmailLocked && (
+                <p className="text-[12px] text-fg-2">Verified — contact HR to change this email.</p>
+              )}
+              {mode === "self" && !workEmailLocked && workEmail && (
+                <p className="text-[12px] text-fg-2">Changing this re-sends a verification email.</p>
+              )}
+            </div>
+          )}
           <div className="space-y-s-2">
             <Label htmlFor="city">City</Label>
             <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} />
@@ -326,6 +362,19 @@ export function ProfileForm({ profile, mode }: Props) {
               onClick={() => submit(buildPatch({ status: "approved" }), "Saved & approved.", "/review")}
             >
               Save &amp; approve
+            </Button>
+          </>
+        ) : mode === "self" ? (
+          <>
+            <Button type="button" variant="ghost" onClick={() => onSaved?.()}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={isPending}
+              onClick={() => submit(buildPatch(), "Changes saved.")}
+            >
+              {isPending ? "Saving…" : "Save changes"}
             </Button>
           </>
         ) : (
