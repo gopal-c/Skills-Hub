@@ -38,7 +38,7 @@ yarn-error.log*
 /.handoff*/hackathon-skills-hub/project
 
 # claude code local settings
-# /.claude
+/.claude
 
 # build logs
 build.log
