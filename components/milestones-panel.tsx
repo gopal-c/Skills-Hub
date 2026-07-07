@@ -7,7 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/domain";
-import type { Milestone, MilestoneCreator } from "@/lib/store";
+import type { Milestone, MilestoneCreator, MilestoneCategory } from "@/lib/store";
+
+const CATEGORY_OPTIONS: { value: MilestoneCategory; label: string }[] = [
+  { value: "achievement", label: "Achievement" },
+  { value: "promotion", label: "Promotion" },
+  { value: "certification", label: "Certification" },
+  { value: "education", label: "Education" },
+  { value: "milestone", label: "Milestone" },
+  { value: "other", label: "Other" },
+];
 
 type Props = {
   profileId: string;
@@ -27,6 +36,7 @@ export function MilestonesPanel({
 }: Props) {
   const [milestones, setMilestones] = useState<Milestone[]>(initialMilestones);
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<MilestoneCategory>("achievement");
   const [date, setDate] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isAdding, startAdding] = useTransition();
@@ -44,7 +54,7 @@ export function MilestonesPanel({
         const res = await fetch("/api/milestones", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ profileId, title: title.trim(), milestoneDate: date }),
+          body: JSON.stringify({ profileId, title: title.trim(), milestoneDate: date, category }),
         });
         const data = await res.json();
         if (!data.ok) {
@@ -55,6 +65,7 @@ export function MilestonesPanel({
           [...prev, data.milestone as Milestone].sort((a, b) => (a.milestoneDate < b.milestoneDate ? 1 : -1)),
         );
         setTitle("");
+        setCategory("achievement");
         setDate("");
       } catch {
         toast.error("Network error — try again.");
@@ -94,6 +105,9 @@ export function MilestonesPanel({
               >
                 <span className="flex-1 truncate text-[14px] text-fg-1">{m.title}</span>
                 <span className="rounded-pill bg-bg-sunken px-s-2 py-[2px] font-mono text-[10px] uppercase tracking-eyebrow text-fg-2">
+                  {m.category}
+                </span>
+                <span className="rounded-pill bg-bg-sunken px-s-2 py-[2px] font-mono text-[10px] uppercase tracking-eyebrow text-fg-2">
                   {m.createdBy === "hr" ? "HR" : "Employee"}
                 </span>
                 <span className="font-mono text-[12px] text-fg-2">{formatDate(m.milestoneDate)}</span>
@@ -117,12 +131,22 @@ export function MilestonesPanel({
           </ul>
         )}
 
-        <form onSubmit={handleAdd} className="grid grid-cols-1 items-end gap-s-2 sm:grid-cols-[1fr_160px_auto]">
+        <form onSubmit={handleAdd} className="grid grid-cols-1 items-end gap-s-2 sm:grid-cols-[1fr_140px_160px_auto]">
           <Input
             placeholder="Achievement or milestone title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
+          <select
+            aria-label="Category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as MilestoneCategory)}
+            className="h-9 rounded-md border border-border-hairline bg-bg-card px-s-2 text-[13px] text-fg-1"
+          >
+            {CATEGORY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
           <Input
             type="date"
             aria-label="Date"

@@ -33,10 +33,14 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const session = await requireRole("any");
 
+  const VALID_CATEGORIES = ["achievement", "promotion", "certification", "education", "milestone", "other"] as const;
+  type Cat = typeof VALID_CATEGORIES[number];
+
   const body = (await req.json()) as Record<string, unknown>;
   const profileId      = typeof body.profileId === "string" ? body.profileId : "";
   const title           = typeof body.title === "string" ? body.title.trim() : "";
   const milestoneDate    = typeof body.milestoneDate === "string" ? body.milestoneDate : "";
+  const category        = VALID_CATEGORIES.includes(body.category as Cat) ? (body.category as Cat) : "achievement";
 
   if (!profileId || !title || !milestoneDate) {
     return NextResponse.json({ ok: false, error: "profileId, title, and milestoneDate are required." }, { status: 400 });
@@ -52,7 +56,6 @@ export async function POST(req: Request) {
     if (!profile) return NextResponse.json({ ok: false, error: "Profile not found." }, { status: 404 });
   }
 
-  // created_by is derived from the session, never trusted from the client.
-  const milestone = await addMilestone(profileId, title, milestoneDate, session.role);
+  const milestone = await addMilestone(profileId, title, milestoneDate, session.role, category);
   return NextResponse.json({ ok: true, milestone });
 }
