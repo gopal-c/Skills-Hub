@@ -189,8 +189,6 @@ export function ProfileForm({ profile, mode, onSaved, initialMilestones = [] }: 
         profileId={profile.id}
         initialMilestones={initialMilestones}
         viewerRole={mode === "self" ? "employee" : "hr"}
-        heading={mode === "self" ? "My Milestones & Achievements" : "Milestones & Achievements"}
-        emptyText={mode === "self" ? "No milestones yet — add your first achievement." : "No milestones recorded yet."}
       />
 
       {/* Skills */}
