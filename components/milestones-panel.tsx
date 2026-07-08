@@ -12,8 +12,6 @@ import type { Milestone, MilestoneCreator, MilestoneCategory } from "@/lib/store
 const CATEGORY_OPTIONS: { value: MilestoneCategory; label: string }[] = [
   { value: "achievement", label: "Achievement" },
   { value: "promotion", label: "Promotion" },
-  { value: "certification", label: "Certification" },
-  { value: "education", label: "Education" },
   { value: "milestone", label: "Milestone" },
   { value: "other", label: "Other" },
 ];

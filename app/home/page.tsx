@@ -135,7 +135,15 @@ export default async function EmployeeHomePage() {
               </div>
               <div>
                 <h2 className="timeline-section-heading">{"Professional Growth 📚"}</h2>
-                <TimelineColumn items={home.rightColumn} emptyText="Add certifications and courses to track your professional growth." variant="growth" />
+                <TimelineColumn
+                  items={home.rightColumn}
+                  emptyText={
+                    home.rightEmptyReason === "no-education"
+                      ? "Upload a resume to populate your professional growth timeline."
+                      : "No certifications or courses recorded after your joining date. Upload an updated resume to add them."
+                  }
+                  variant="growth"
+                />
               </div>
             </div>
           </>

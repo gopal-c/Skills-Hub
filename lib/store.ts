@@ -345,8 +345,6 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed probation period", date: "2024-04-15", category: "milestone", createdBy: "hr" },
       { title: "Company Hackathon — 2nd Place", date: "2024-11-20", category: "achievement", createdBy: "hr" },
-      { title: "React Developer Certification", date: "2025-02-10", category: "certification", createdBy: "employee" },
-      { title: "Completed Advanced TypeScript Course", date: "2025-06-01", category: "education", createdBy: "employee" },
       { title: "Led checkout redesign launch", date: "2025-08-15", category: "achievement", createdBy: "hr" },
       { title: "Mentored 2 new interns", date: "2026-03-10", category: "achievement", createdBy: "hr" },
     ],
@@ -356,11 +354,8 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed probation period", date: "2022-06-01", category: "milestone", createdBy: "hr" },
       { title: "Promoted to Mid-Level Engineer", date: "2023-04-01", category: "promotion", createdBy: "hr" },
-      { title: "AWS Solutions Architect Associate", date: "2023-08-15", category: "certification", createdBy: "employee" },
       { title: "Led payouts ledger service to production", date: "2024-02-20", category: "achievement", createdBy: "hr" },
-      { title: "Completed Distributed Systems Design Course", date: "2024-06-12", category: "education", createdBy: "employee" },
       { title: "Speaker at internal tech talks — gRPC patterns", date: "2025-01-18", category: "achievement", createdBy: "employee" },
-      { title: "Google Cloud Professional Data Engineer", date: "2025-09-05", category: "certification", createdBy: "employee" },
       { title: "Reconciliation engine 99.9% uptime milestone", date: "2026-02-01", category: "achievement", createdBy: "hr" },
     ],
   },
@@ -368,12 +363,9 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     joiningDate: "2021-06-15", dateOfBirth: "1994-03-22",
     milestones: [
       { title: "Promoted to Senior Engineer", date: "2022-07-01", category: "promotion", createdBy: "hr" },
-      { title: "AWS Developer Associate", date: "2022-11-10", category: "certification", createdBy: "employee" },
       { title: "Marketplace pipeline shipped — 50k orders/day", date: "2023-03-15", category: "achievement", createdBy: "hr" },
-      { title: "Completed Kubernetes Administration Course", date: "2023-09-20", category: "education", createdBy: "employee" },
       { title: "Led seller dashboard 2.0 rewrite", date: "2024-01-10", category: "achievement", createdBy: "hr" },
       { title: "Company Hackathon — 1st Place", date: "2024-11-20", category: "achievement", createdBy: "hr" },
-      { title: "Certified Kubernetes Application Developer", date: "2025-04-08", category: "certification", createdBy: "employee" },
       { title: "Promoted to Staff Engineer", date: "2026-01-15", category: "promotion", createdBy: "hr" },
     ],
   },
@@ -381,13 +373,10 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     joiningDate: "2021-01-10", dateOfBirth: "1988-11-05",
     milestones: [
       { title: "Promoted to Engineering Lead", date: "2021-07-01", category: "promotion", createdBy: "hr" },
-      { title: "Completed Executive Leadership Program", date: "2022-03-15", category: "education", createdBy: "employee" },
       { title: "Event platform scaled to 1M events/sec", date: "2022-09-20", category: "achievement", createdBy: "hr" },
-      { title: "Apache Kafka Confluent Certified Developer", date: "2023-01-25", category: "certification", createdBy: "employee" },
       { title: "Observability rewrite — 60% cost reduction", date: "2023-08-10", category: "achievement", createdBy: "hr" },
       { title: "Built and grew platform team to 12 engineers", date: "2024-04-01", category: "achievement", createdBy: "hr" },
       { title: "Speaker at GopherCon India", date: "2025-02-15", category: "achievement", createdBy: "employee" },
-      { title: "AWS Solutions Architect Professional", date: "2025-07-20", category: "certification", createdBy: "employee" },
       { title: "Promoted to Principal Engineer", date: "2026-03-01", category: "promotion", createdBy: "hr" },
     ],
   },
@@ -395,9 +384,7 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     joiningDate: "2023-02-01", dateOfBirth: "1998-07-14",
     milestones: [
       { title: "Completed probation period", date: "2023-05-01", category: "milestone", createdBy: "hr" },
-      { title: "WCAG 2.1 Accessibility Specialist Certification", date: "2023-10-15", category: "certification", createdBy: "employee" },
       { title: "Design system component library launched", date: "2024-03-20", category: "achievement", createdBy: "hr" },
-      { title: "Completed Advanced Vue.js Patterns Course", date: "2024-08-12", category: "education", createdBy: "employee" },
       { title: "Promoted to Mid-Level Frontend Engineer", date: "2025-02-01", category: "promotion", createdBy: "hr" },
       { title: "Led accessibility audit — WCAG AA compliance", date: "2025-11-10", category: "achievement", createdBy: "hr" },
     ],
@@ -406,11 +393,8 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     joiningDate: "2021-09-01", dateOfBirth: "1993-04-18",
     milestones: [
       { title: "Promoted to Senior Data Scientist", date: "2022-09-01", category: "promotion", createdBy: "hr" },
-      { title: "TensorFlow Developer Certificate", date: "2022-12-10", category: "certification", createdBy: "employee" },
       { title: "Fraud model reduced chargebacks by 35%", date: "2023-05-15", category: "achievement", createdBy: "hr" },
-      { title: "Completed Deep Learning Specialization", date: "2023-11-20", category: "education", createdBy: "employee" },
       { title: "Published internal ML best-practices guide", date: "2024-06-01", category: "achievement", createdBy: "employee" },
-      { title: "AWS Machine Learning Specialty", date: "2025-01-15", category: "certification", createdBy: "employee" },
       { title: "Real-time inference pipeline in production", date: "2025-08-20", category: "achievement", createdBy: "hr" },
       { title: "Mentored 4 junior data scientists", date: "2026-04-01", category: "achievement", createdBy: "hr" },
     ],
@@ -420,8 +404,6 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed onboarding bootcamp", date: "2025-04-15", category: "milestone", createdBy: "hr" },
       { title: "First bug fix merged to production", date: "2025-05-10", category: "achievement", createdBy: "hr" },
-      { title: "Docker Fundamentals Certification", date: "2025-08-20", category: "certification", createdBy: "employee" },
-      { title: "Completed Figma for Developers Course", date: "2026-01-10", category: "education", createdBy: "employee" },
       { title: "Redesigned onboarding email templates", date: "2026-05-15", category: "achievement", createdBy: "hr" },
     ],
   },
@@ -430,9 +412,7 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed probation period", date: "2022-10-15", category: "milestone", createdBy: "hr" },
       { title: "Promoted to Product Designer", date: "2023-08-01", category: "promotion", createdBy: "hr" },
-      { title: "Google UX Design Professional Certificate", date: "2024-01-20", category: "certification", createdBy: "employee" },
       { title: "Redesigned customer dashboard — NPS +12", date: "2024-07-15", category: "achievement", createdBy: "hr" },
-      { title: "Completed Interaction Design Course", date: "2025-03-10", category: "education", createdBy: "employee" },
       { title: "Design system adoption reached 90% across teams", date: "2025-10-01", category: "achievement", createdBy: "hr" },
       { title: "Speaker at DesignUp conference", date: "2026-02-20", category: "achievement", createdBy: "employee" },
     ],
@@ -441,12 +421,9 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     joiningDate: "2021-02-01", dateOfBirth: "1986-08-30",
     milestones: [
       { title: "Promoted to Engineering Director", date: "2021-08-01", category: "promotion", createdBy: "hr" },
-      { title: "Completed CTO Leadership Workshop", date: "2022-02-15", category: "education", createdBy: "employee" },
       { title: "Platform migration to microservices complete", date: "2022-09-01", category: "achievement", createdBy: "hr" },
-      { title: "AWS Solutions Architect Professional", date: "2023-03-10", category: "certification", createdBy: "employee" },
       { title: "Engineering org grew from 30 to 65", date: "2023-12-01", category: "achievement", createdBy: "hr" },
       { title: "Introduced company-wide OKR framework", date: "2024-04-01", category: "achievement", createdBy: "hr" },
-      { title: "Completed Executive MBA module", date: "2025-01-20", category: "education", createdBy: "employee" },
       { title: "99.99% platform uptime achieved", date: "2025-09-01", category: "achievement", createdBy: "hr" },
       { title: "Promoted to VP Engineering", date: "2026-04-01", category: "promotion", createdBy: "hr" },
     ],
@@ -455,23 +432,17 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     joiningDate: "2022-11-01", dateOfBirth: "1997-05-09",
     milestones: [
       { title: "Completed probation period", date: "2023-02-01", category: "milestone", createdBy: "hr" },
-      { title: "ISTQB Foundation Level Certification", date: "2023-06-15", category: "certification", createdBy: "employee" },
       { title: "Automated 80% of regression test suite", date: "2024-01-20", category: "achievement", createdBy: "hr" },
-      { title: "Completed Performance Testing Course", date: "2024-07-10", category: "education", createdBy: "employee" },
       { title: "Promoted to Senior QA Engineer", date: "2025-02-01", category: "promotion", createdBy: "hr" },
       { title: "Zero critical bugs in last 3 releases", date: "2025-10-15", category: "achievement", createdBy: "hr" },
-      { title: "Cypress.io Expert Certification", date: "2026-03-20", category: "certification", createdBy: "employee" },
     ],
   },
   "devansh.patel@demo.com": {
     joiningDate: "2021-11-15", dateOfBirth: "1995-01-20",
     milestones: [
       { title: "Promoted to Senior DevOps Engineer", date: "2022-12-01", category: "promotion", createdBy: "hr" },
-      { title: "HashiCorp Terraform Associate", date: "2023-04-20", category: "certification", createdBy: "employee" },
       { title: "CI/CD pipeline reduced deploy time by 70%", date: "2023-09-15", category: "achievement", createdBy: "hr" },
-      { title: "Completed Site Reliability Engineering Course", date: "2024-02-10", category: "education", createdBy: "employee" },
       { title: "Kubernetes cluster migration — zero downtime", date: "2024-08-01", category: "achievement", createdBy: "hr" },
-      { title: "CKA — Certified Kubernetes Administrator", date: "2025-03-15", category: "certification", createdBy: "employee" },
       { title: "Infrastructure cost reduced by 40%", date: "2025-12-01", category: "achievement", createdBy: "hr" },
       { title: "Promoted to Lead Platform Engineer", date: "2026-06-01", category: "promotion", createdBy: "hr" },
     ],
@@ -481,10 +452,7 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed onboarding bootcamp", date: "2024-06-15", category: "milestone", createdBy: "hr" },
       { title: "First feature shipped to production", date: "2024-08-20", category: "achievement", createdBy: "hr" },
-      { title: "HubSpot Inbound Marketing Certification", date: "2024-12-10", category: "certification", createdBy: "employee" },
-      { title: "Completed Growth Hacking Course", date: "2025-04-15", category: "education", createdBy: "employee" },
       { title: "Content campaign drove 2x organic traffic", date: "2025-09-01", category: "achievement", createdBy: "hr" },
-      { title: "Google Analytics Professional Certificate", date: "2026-02-10", category: "certification", createdBy: "employee" },
     ],
   },
   "aditya.nair@demo.com": {
@@ -492,8 +460,6 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Promoted to Senior Mobile Engineer", date: "2022-08-01", category: "promotion", createdBy: "hr" },
       { title: "App Store rating improved from 3.8 to 4.6", date: "2023-02-15", category: "achievement", createdBy: "hr" },
-      { title: "Google Associate Android Developer", date: "2023-07-20", category: "certification", createdBy: "employee" },
-      { title: "Completed Flutter Advanced Patterns Course", date: "2024-01-10", category: "education", createdBy: "employee" },
       { title: "Led cross-platform migration to Flutter", date: "2024-06-15", category: "achievement", createdBy: "hr" },
       { title: "App crash rate reduced below 0.1%", date: "2025-01-20", category: "achievement", createdBy: "hr" },
       { title: "Apple WWDC scholarship recipient", date: "2025-06-10", category: "achievement", createdBy: "employee" },
@@ -505,11 +471,8 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed probation period", date: "2023-08-15", category: "milestone", createdBy: "hr" },
       { title: "Promoted to Mid-Level Backend Engineer", date: "2024-06-01", category: "promotion", createdBy: "hr" },
-      { title: "Completed System Design Course", date: "2024-03-20", category: "education", createdBy: "employee" },
       { title: "API gateway migration — 30% latency reduction", date: "2024-10-15", category: "achievement", createdBy: "hr" },
-      { title: "MongoDB Developer Certification", date: "2025-02-10", category: "certification", createdBy: "employee" },
       { title: "Microservices auth module shipped", date: "2025-08-20", category: "achievement", createdBy: "hr" },
-      { title: "Redis University Certified Developer", date: "2026-01-15", category: "certification", createdBy: "employee" },
     ],
   },
   "naveen.rao@demo.com": {
@@ -517,13 +480,21 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
     milestones: [
       { title: "Completed onboarding bootcamp", date: "2024-09-15", category: "milestone", createdBy: "hr" },
       { title: "First pull request merged", date: "2024-10-05", category: "achievement", createdBy: "hr" },
-      { title: "Completed Python for Data Science Course", date: "2025-01-20", category: "education", createdBy: "employee" },
       { title: "Built internal data pipeline prototype", date: "2025-05-10", category: "achievement", createdBy: "hr" },
-      { title: "Databricks Lakehouse Fundamentals", date: "2025-10-15", category: "certification", createdBy: "employee" },
       { title: "Automated 3 manual reporting workflows", date: "2026-04-20", category: "achievement", createdBy: "hr" },
     ],
   },
 };
+
+async function seedDatesForDemoProfiles(): Promise<void> {
+  for (const [email, data] of Object.entries(MILESTONE_SEEDS)) {
+    await sql`
+      UPDATE profiles
+      SET joining_date = ${data.joiningDate}::date, date_of_birth = ${data.dateOfBirth}::date
+      WHERE lower(email) = ${email.toLowerCase()} AND joining_date IS NULL
+    `;
+  }
+}
 
 async function seedMilestonesForDemoProfiles(): Promise<number> {
   const { rows: existing } = await sql<{ c: number }>`SELECT COUNT(*)::int AS c FROM milestones`;
@@ -536,12 +507,6 @@ async function seedMilestonesForDemoProfiles(): Promise<number> {
     `;
     if (!profiles[0]) continue;
     const profileId = profiles[0].id;
-
-    await sql`
-      UPDATE profiles
-      SET joining_date = ${data.joiningDate}::date, date_of_birth = ${data.dateOfBirth}::date
-      WHERE id = ${profileId} AND joining_date IS NULL
-    `;
 
     for (const m of data.milestones) {
       const id = randomUUID();
@@ -571,6 +536,7 @@ async function ensureSeeded(): Promise<void> {
     await seedDemoUsers();
     await seedProfilesFromJson();
     await backfillUsersFromProfiles();
+    await seedDatesForDemoProfiles();
     await seedMilestonesForDemoProfiles();
   })().catch((err) => {
     bootstrapPromise = null;
