@@ -1507,7 +1507,7 @@
   box-shadow: var(--shadow-1);
   transition: all var(--t-base) var(--ease-out);
 }
-.home-nav-card-active:hover { transform: translateY(-1px); }
+.home-nav-card-active:hover { }
 
 /* Counter badges */
 .milestone-badge {
@@ -1567,7 +1567,6 @@
     0 1px 0 rgba(255, 255, 255, 0.95) inset,
     0 18px 40px -18px rgba(21, 22, 52, 0.16),
     0 2px 8px rgba(21, 22, 52, 0.04);
-  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 .home-stat-card::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
@@ -1580,13 +1579,6 @@
   pointer-events: none; mix-blend-mode: overlay;
 }
 .home-stat-card > * { position: relative; z-index: 1; }
-.home-stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 24px 48px -18px rgba(21, 22, 52, 0.22), 0 2px 8px rgba(21, 22, 52, 0.06);
-}
-@media (prefers-reduced-motion: reduce) {
-  .home-stat-card, .home-stat-card:hover { transition: none; transform: none; }
-}
 .home-stat-card {
   display: flex;
   align-items: center;
@@ -1672,7 +1664,6 @@
     0 18px 40px -18px rgba(21, 22, 52, 0.16),
     0 2px 8px rgba(21, 22, 52, 0.04);
   display: flex; flex-direction: column; gap: 8px;
-  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 .tl-project-card::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
@@ -1682,11 +1673,6 @@
   pointer-events: none; mix-blend-mode: overlay;
 }
 .tl-project-card > * { position: relative; z-index: 1; }
-.tl-project-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 24px 48px -18px rgba(21, 22, 52, 0.22), 0 2px 8px rgba(21, 22, 52, 0.06);
-}
-
 .tl-edu-card {
   position: relative;
   padding: 18px 20px;
@@ -1703,7 +1689,6 @@
     0 18px 40px -18px rgba(91, 71, 224, 0.18),
     0 2px 8px rgba(21, 22, 52, 0.04);
   display: flex; flex-direction: column; gap: 8px;
-  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 .tl-edu-card::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
@@ -1713,15 +1698,6 @@
   pointer-events: none; mix-blend-mode: overlay;
 }
 .tl-edu-card > * { position: relative; z-index: 1; }
-.tl-edu-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 24px 48px -18px rgba(91, 71, 224, 0.28), 0 2px 8px rgba(21, 22, 52, 0.06);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tl-project-card, .tl-project-card:hover,
-  .tl-edu-card, .tl-edu-card:hover { transition: none; transform: none; }
-}
 
 /* Shared timeline card inner elements */
 .tl-card-head {
