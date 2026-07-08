@@ -145,12 +145,20 @@ function rowToMilestone(r: MilestoneRow): Milestone {
     id: r.id,
     profileId: r.profile_id,
     title: r.title,
-    milestoneDate: r.milestone_date ? String(r.milestone_date).slice(0, 10) : r.milestone_date,
+    milestoneDate: toDateStr(r.milestone_date) ?? r.milestone_date,
     category: r.category ?? "achievement",
     createdBy: r.created_by,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
+}
+
+function toDateStr(v: unknown): string | null {
+  if (!v) return null;
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  const s = String(v);
+  if (s.length >= 10 && s[4] === "-") return s.slice(0, 10);
+  return null;
 }
 
 function rowToProfile(r: Row): Profile {
@@ -172,8 +180,8 @@ function rowToProfile(r: Row): Profile {
     workEmailVerified: r.work_email_verified ?? false,
     workEmailVerificationToken: r.work_email_verification_token ?? null,
     workEmailVerificationExpiresAt: r.work_email_verification_expires_at ?? null,
-    joiningDate: r.joining_date ? String(r.joining_date).slice(0, 10) : null,
-    dateOfBirth: r.date_of_birth ? String(r.date_of_birth).slice(0, 10) : null,
+    joiningDate: toDateStr(r.joining_date),
+    dateOfBirth: toDateStr(r.date_of_birth),
   };
 }
 
