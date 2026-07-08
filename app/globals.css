@@ -1470,15 +1470,6 @@
 .ai-resume-panel .ai-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ─── Employee Home Timeline ─── */
-.home-timeline-bg {
-  background:
-    radial-gradient(900px 600px at 8% -10%,  rgba(139,123,232,0.22), transparent 60%),
-    radial-gradient(800px 600px at 100% 20%, rgba(255,154,130,0.18), transparent 60%),
-    radial-gradient(900px 700px at 50% 110%, rgba(124,211,197,0.18), transparent 60%),
-    radial-gradient(700px 500px at -10% 70%, rgba(255,203,107,0.16), transparent 60%),
-    var(--t-bg-page);
-  background-attachment: fixed;
-}
 .home-timeline-heading {
   font: var(--t-h1);
   color: var(--t-fg-1);

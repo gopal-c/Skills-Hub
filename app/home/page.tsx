@@ -21,7 +21,10 @@ export default async function EmployeeHomePage() {
   const home = approved && profile ? buildHomeData(profile, milestones) : null;
 
   return (
-    <div data-theme="dark" className="theme-shell home-timeline-bg">
+    <div data-theme="dark" className="theme-shell">
+      <div className="theme-glow g1" aria-hidden />
+      <div className="theme-glow g2" aria-hidden />
+      <div className="theme-glow g3" aria-hidden />
       <RoleHeader session={session} eyebrow="Home" employeeApproved={approved} />
 
       <section className="relative z-[1] mx-auto max-w-5xl px-s-8 py-s-10">
