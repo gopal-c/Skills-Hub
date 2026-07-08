@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Trash2, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ export function MilestonesPanel({ profileId, initialMilestones }: Props) {
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState<MilestoneCategory>("achievement");
   const [newDate, setNewDate] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isAdding, startAdding] = useTransition();
 
   function handleAdd() {
@@ -48,12 +50,14 @@ export function MilestonesPanel({ profileId, initialMilestones }: Props) {
   }
 
   async function handleDelete(id: string) {
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/milestones/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (!data.ok) { toast.error(data.error ?? "Couldn't delete milestone."); return; }
       setMilestones((prev) => prev.filter((m) => m.id !== id));
     } catch { toast.error("Network error — try again."); }
+    finally { setDeletingId(null); }
   }
 
   return (
@@ -73,9 +77,10 @@ export function MilestonesPanel({ profileId, initialMilestones }: Props) {
               variant="ghost"
               size="sm"
               onClick={() => handleDelete(m.id)}
+              disabled={deletingId === m.id}
               aria-label={`Remove ${m.title}`}
             >
-              ×
+              {deletingId === m.id ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
             </Button>
           </div>
         ))}
