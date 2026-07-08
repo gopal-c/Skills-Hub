@@ -12,6 +12,7 @@ const CATEGORY_OPTIONS: { value: MilestoneCategory; label: string }[] = [
   { value: "achievement", label: "Achievement" },
   { value: "promotion", label: "Promotion" },
   { value: "milestone", label: "Milestone" },
+  { value: "celebration", label: "Celebration" },
   { value: "other", label: "Other" },
 ];
 
@@ -95,7 +96,7 @@ export function MilestonesPanel({ profileId, initialMilestones }: Props) {
             aria-label="Category"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value as MilestoneCategory)}
-            className="h-9 rounded-md border border-border-hairline bg-bg-card px-s-2 text-[13px] text-fg-1"
+            className="flex h-9 w-full rounded-md border border-input bg-background px-2 text-[13px] text-foreground"
           >
             {CATEGORY_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>

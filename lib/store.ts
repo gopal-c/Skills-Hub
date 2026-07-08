@@ -65,7 +65,7 @@ export type Profile = {
 };
 
 export type MilestoneCreator = "hr" | "employee";
-export type MilestoneCategory = "achievement" | "promotion" | "certification" | "education" | "milestone" | "other";
+export type MilestoneCategory = "achievement" | "promotion" | "certification" | "education" | "milestone" | "celebration" | "other";
 
 export type Milestone = {
   id: string;

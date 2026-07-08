@@ -14,6 +14,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   milestone: "var(--brand-teal)",
   certification: "var(--brand-indigo)",
   education: "var(--brand-indigo)",
+  celebration: "var(--brand-coral)",
   other: "var(--brand-indigo)",
 };
 

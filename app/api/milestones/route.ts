@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const session = await requireRole("any");
 
-  const VALID_CATEGORIES = ["achievement", "promotion", "certification", "education", "milestone", "other"] as const;
+  const VALID_CATEGORIES = ["achievement", "promotion", "certification", "education", "milestone", "celebration", "other"] as const;
   type Cat = typeof VALID_CATEGORIES[number];
 
   const body = (await req.json()) as Record<string, unknown>;
