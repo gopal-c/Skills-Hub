@@ -486,12 +486,17 @@ const MILESTONE_SEEDS: Record<string, { joiningDate: string; dateOfBirth: string
   },
 };
 
+let datesSeeded = false;
 async function seedDatesForDemoProfiles(): Promise<void> {
+  if (datesSeeded) return;
+  datesSeeded = true;
   for (const [email, data] of Object.entries(MILESTONE_SEEDS)) {
     await sql`
       UPDATE profiles
-      SET joining_date = ${data.joiningDate}::date, date_of_birth = ${data.dateOfBirth}::date
-      WHERE lower(email) = ${email.toLowerCase()} AND joining_date IS NULL
+      SET joining_date = COALESCE(joining_date, ${data.joiningDate}::date),
+          date_of_birth = COALESCE(date_of_birth, ${data.dateOfBirth}::date)
+      WHERE lower(email) = ${email.toLowerCase()}
+        AND (joining_date IS NULL OR date_of_birth IS NULL)
     `;
   }
 }
@@ -549,6 +554,7 @@ async function ensureSeeded(): Promise<void> {
 
 export async function getProfiles(): Promise<Profile[]> {
   await ensureSeeded();
+  await seedDatesForDemoProfiles();
   const { rows } = await sql<Row>`SELECT * FROM profiles ORDER BY created_at DESC`;
   return rows.map(rowToProfile);
 }
@@ -561,6 +567,7 @@ export async function getProfile(id: string): Promise<Profile | undefined> {
 
 export async function getProfileByEmail(email: string): Promise<Profile | undefined> {
   await ensureSeeded();
+  await seedDatesForDemoProfiles();
   const { rows } = await sql<Row>`
     SELECT * FROM profiles WHERE lower(email) = ${email.toLowerCase()} ORDER BY created_at DESC LIMIT 1
   `;

@@ -3,6 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { DeleteProfileButton } from "@/components/delete-profile-button";
 import { EditableAvatar } from "@/components/editable-avatar";
 import { avatarPalette, initials } from "@/lib/avatar-gradient";
+import { formatDate } from "@/lib/domain";
 import type { Profile, Skill } from "@/lib/store";
 
 const CATEGORY_ORDER = ["language", "framework", "database", "cloud", "tool", "domain", "soft"];
@@ -77,6 +78,18 @@ export function ProfileView({
             <span>{profile.city}</span>
             <span className="sep">·</span>
             <span>{profile.yearsExperience} yrs experience</span>
+            {profile.joiningDate && (
+              <>
+                <span className="sep">·</span>
+                <span>Joined {formatDate(profile.joiningDate)}</span>
+              </>
+            )}
+            {profile.dateOfBirth && (
+              <>
+                <span className="sep">·</span>
+                <span>DOB {formatDate(profile.dateOfBirth)}</span>
+              </>
+            )}
             {isPending && <span className="pending-pill">Pending review</span>}
           </div>
         </div>
