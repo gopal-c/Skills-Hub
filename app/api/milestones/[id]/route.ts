@@ -19,8 +19,7 @@ export async function DELETE(_req: Request, { params }: Params) {
 
   if (session.role === "employee") {
     const own = await getProfileByEmail(session.email);
-    const isOwnProfile = own?.id === milestone.profileId;
-    if (!isOwnProfile || milestone.createdBy !== "employee") {
+    if (!own || own.id !== milestone.profileId) {
       return NextResponse.json({ ok: false, error: "You can't delete that milestone." }, { status: 403 });
     }
   }

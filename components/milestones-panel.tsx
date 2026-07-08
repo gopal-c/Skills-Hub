@@ -17,20 +17,14 @@ const CATEGORY_OPTIONS: { value: MilestoneCategory; label: string }[] = [
 type Props = {
   profileId: string;
   initialMilestones: Milestone[];
-  viewerRole: "hr" | "employee";
 };
 
-export function MilestonesPanel({ profileId, initialMilestones, viewerRole }: Props) {
+export function MilestonesPanel({ profileId, initialMilestones }: Props) {
   const [milestones, setMilestones] = useState<Milestone[]>(initialMilestones);
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState<MilestoneCategory>("achievement");
   const [newDate, setNewDate] = useState("");
   const [isAdding, startAdding] = useTransition();
-
-  function canDelete(m: Milestone): boolean {
-    if (viewerRole === "hr") return true;
-    return m.createdBy === "employee";
-  }
 
   function handleAdd() {
     if (!newTitle.trim() || !newDate) return;
@@ -74,19 +68,15 @@ export function MilestonesPanel({ profileId, initialMilestones, viewerRole }: Pr
             <Input value={m.title} disabled />
             <Input value={m.category} disabled className="capitalize" />
             <Input type="date" value={m.milestoneDate} disabled />
-            {canDelete(m) ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(m.id)}
-                aria-label={`Remove ${m.title}`}
-              >
-                ×
-              </Button>
-            ) : (
-              <span className="flex h-9 items-center justify-center text-[11px] text-fg-3" title="Added by HR">🔒</span>
-            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDelete(m.id)}
+              aria-label={`Remove ${m.title}`}
+            >
+              ×
+            </Button>
           </div>
         ))}
         {/* Add row — same inline layout as existing items */}

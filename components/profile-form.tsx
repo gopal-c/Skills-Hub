@@ -188,7 +188,6 @@ export function ProfileForm({ profile, mode, onSaved, initialMilestones = [] }: 
       <MilestonesPanel
         profileId={profile.id}
         initialMilestones={initialMilestones}
-        viewerRole={mode === "self" ? "employee" : "hr"}
       />
 
       {/* Skills */}
