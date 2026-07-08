@@ -65,11 +65,13 @@ export default async function EmployeeHomePage() {
         {/* Approved: full timeline page */}
         {approved && home && (
           <>
-            {/* Nav cards */}
-            <div className="mt-s-6 grid gap-s-4 sm:grid-cols-2">
-              <HomeCard href="/me" enabled icon={<User className="size-5" />} title="My Profile" description="View your skills, experience, and profile details." />
-              <HomeCard href="/upload" enabled icon={<FileText className="size-5" />} title="Update Profile" description="Upload a new resume to refresh your profile." />
-            </div>
+            {/* Nav cards — hidden when timeline has content */}
+            {home.leftColumn.length === 0 && home.rightColumn.length === 0 && (
+              <div className="mt-s-6 grid gap-s-4 sm:grid-cols-2">
+                <HomeCard href="/me" enabled icon={<User className="size-5" />} title="My Profile" description="View your skills, experience, and profile details." />
+                <HomeCard href="/upload" enabled icon={<FileText className="size-5" />} title="Update Profile" description="Upload a new resume to refresh your profile." />
+              </div>
+            )}
 
             {/* Counter badges */}
             <div className="mt-s-8 flex flex-wrap gap-s-2">
