@@ -115,7 +115,6 @@ export function MilestonesPanel({ profileId, initialMilestones, viewerRole }: Pr
           />
           <Button
             type="button"
-            variant="ghost"
             size="sm"
             disabled={isAdding || !newTitle.trim() || !newDate}
             onClick={handleAdd}
@@ -123,18 +122,6 @@ export function MilestonesPanel({ profileId, initialMilestones, viewerRole }: Pr
             {isAdding ? "…" : "+"}
           </Button>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            if (!newTitle.trim()) setNewTitle("");
-            const input = document.querySelector<HTMLInputElement>('[placeholder="Achievement or milestone title"]');
-            input?.focus();
-          }}
-        >
-          + Add milestone
-        </Button>
       </CardContent>
     </Card>
   );
