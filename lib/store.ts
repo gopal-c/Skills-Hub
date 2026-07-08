@@ -145,7 +145,7 @@ function rowToMilestone(r: MilestoneRow): Milestone {
     id: r.id,
     profileId: r.profile_id,
     title: r.title,
-    milestoneDate: r.milestone_date,
+    milestoneDate: r.milestone_date ? String(r.milestone_date).slice(0, 10) : r.milestone_date,
     category: r.category ?? "achievement",
     createdBy: r.created_by,
     createdAt: r.created_at,
@@ -172,8 +172,8 @@ function rowToProfile(r: Row): Profile {
     workEmailVerified: r.work_email_verified ?? false,
     workEmailVerificationToken: r.work_email_verification_token ?? null,
     workEmailVerificationExpiresAt: r.work_email_verification_expires_at ?? null,
-    joiningDate: r.joining_date ?? null,
-    dateOfBirth: r.date_of_birth ?? null,
+    joiningDate: r.joining_date ? String(r.joining_date).slice(0, 10) : null,
+    dateOfBirth: r.date_of_birth ? String(r.date_of_birth).slice(0, 10) : null,
   };
 }
 
