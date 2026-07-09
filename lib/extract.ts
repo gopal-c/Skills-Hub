@@ -17,7 +17,7 @@ export type ExtractedProfile = {
   yearsExperience: number;
   skills:    Array<{ name: string; category: string; proficiency: Proficiency; yearsExperience: number }>;
   projects:  Array<{ name: string; description: string; skillsUsed: string[]; duration: string }>;
-  education: Array<{ degree: string; institution: string; year: number }>;
+  education: Array<{ degree: string; institution: string; year: number; month?: number }>;
 };
 
 export class ExtractError extends Error {
@@ -39,7 +39,7 @@ const SYSTEM_PROMPT = `You are a careful resume parser. Read the resume text and
   "yearsExperience": number,
   "skills": [{ "name": string, "category": string, "proficiency": "beginner" | "intermediate" | "advanced" | "expert", "yearsExperience": number }],
   "projects": [{ "name": string, "description": string, "skillsUsed": string[], "duration": string }],
-  "education": [{ "degree": string, "institution": string, "year": number }]
+  "education": [{ "degree": string, "institution": string, "year": number, "month": number | null }]
 }
 
 Guidance:
@@ -95,6 +95,7 @@ function coerce(raw: unknown): ExtractedProfile | null {
       degree: ex.degree,
       institution: typeof ex.institution === "string" ? ex.institution : "",
       year: typeof ex.year === "number" ? ex.year : 0,
+      month: typeof ex.month === "number" && ex.month >= 1 && ex.month <= 12 ? ex.month : undefined,
     }];
   }) : [];
 

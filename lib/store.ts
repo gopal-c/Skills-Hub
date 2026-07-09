@@ -38,6 +38,7 @@ export type Education = {
   degree: string;
   institution: string;
   year: number;
+  month?: number;
 };
 
 export type Profile = {

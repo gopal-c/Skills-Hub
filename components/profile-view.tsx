@@ -176,7 +176,7 @@ export function ProfileView({
                   <div className="school">{e.degree}</div>
                   <div className="place">{e.institution}</div>
                 </div>
-                <span className="year">{e.year}</span>
+                <span className="year">{e.month ? `${new Date(2000, e.month - 1).toLocaleString("en-US", { month: "short" })} ${e.year}` : e.year}</span>
               </article>
             ))}
           </div>

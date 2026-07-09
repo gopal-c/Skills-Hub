@@ -39,7 +39,7 @@ function compactProfile(p: Profile, idx: number) {
     years: p.yearsExperience,
     skills: p.skills.map((s) => ({ name: s.name, proficiency: s.proficiency, years: s.yearsExperience })),
     projects: p.projects.map((pr) => ({ name: pr.name, description: pr.description, skills: pr.skillsUsed, duration: pr.duration })),
-    education: p.education.map((e) => `${e.degree} @ ${e.institution} (${e.year})`),
+    education: p.education.map((e) => `${e.degree} @ ${e.institution} (${e.month ? `${new Date(2000, e.month - 1).toLocaleString("en-US", { month: "short" })} ` : ""}${e.year})`),
   };
 }
 

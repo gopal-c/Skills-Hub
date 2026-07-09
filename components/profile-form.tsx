@@ -327,7 +327,7 @@ export function ProfileForm({ profile, mode, onSaved, initialMilestones = [] }: 
             <p className="text-[13px] text-fg-2">No education entries yet.</p>
           )}
           {education.map((e, i) => (
-            <div key={i} className="grid items-end gap-s-2 sm:grid-cols-[1fr_1fr_100px_auto]">
+            <div key={i} className="grid items-end gap-s-2 sm:grid-cols-[1fr_1fr_110px_100px_auto]">
               <Input
                 placeholder="Degree"
                 value={e.degree}
@@ -342,6 +342,24 @@ export function ProfileForm({ profile, mode, onSaved, initialMilestones = [] }: 
                   const next = [...education]; next[i] = { ...next[i], institution: ev.target.value }; setEducation(next);
                 }}
               />
+              <select
+                aria-label="Month"
+                value={e.month ?? ""}
+                onChange={(ev) => {
+                  const next = [...education];
+                  const v = ev.target.value;
+                  next[i] = { ...next[i], month: v ? Number(v) : undefined };
+                  setEducation(next);
+                }}
+                className="flex h-9 w-full rounded-md border border-input bg-background px-2 text-[13px] text-foreground"
+              >
+                <option value="">Month</option>
+                {Array.from({ length: 12 }, (_, m) => (
+                  <option key={m + 1} value={m + 1}>
+                    {new Date(2000, m).toLocaleString("en-US", { month: "short" })}
+                  </option>
+                ))}
+              </select>
               <Input
                 type="number"
                 placeholder="Year"
