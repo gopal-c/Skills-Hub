@@ -51,11 +51,11 @@ export function TimelineColumn({
               <span className="tl-card-icon" style={{ background: CATEGORY_COLOR[item.category] ?? "var(--brand-indigo)" }}>
                 {item.icon}
               </span>
-              <span className="tl-card-date">{formatMonthYear(item.milestoneDate)}</span>
+              <h3 className="tl-card-title">{item.title}</h3>
             </div>
-            <h3 className="tl-card-title">{item.title}</h3>
-            <div className="tl-card-tags">
+            <div className="tl-card-meta">
               <span className="tl-card-badge">{item.category}</span>
+              <span className="tl-card-date">{formatMonthYear(item.milestoneDate)}</span>
             </div>
           </article>
         </div>
