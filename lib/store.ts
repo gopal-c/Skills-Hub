@@ -537,6 +537,23 @@ async function seedMilestonesForDemoProfiles(): Promise<number> {
   return inserted;
 }
 
+let eduMonthsSeeded = false;
+async function seedEducationMonths(): Promise<void> {
+  if (eduMonthsSeeded) return;
+  eduMonthsSeeded = true;
+  const { rows } = await sql<{ id: string; education: Education[] }>`
+    SELECT id, education FROM profiles WHERE education IS NOT NULL
+  `;
+  for (const r of rows) {
+    const edu = r.education;
+    if (!Array.isArray(edu) || edu.length === 0) continue;
+    const needsUpdate = edu.some((e) => !e.month);
+    if (!needsUpdate) continue;
+    const updated = edu.map((e, i) => e.month ? e : { ...e, month: ((i * 3 + 5) % 12) + 1 });
+    await sql`UPDATE profiles SET education = ${JSON.stringify(updated)}::jsonb WHERE id = ${r.id}`;
+  }
+}
+
 /* ─────────── Lazy seed on first read ─────────── */
 
 let bootstrapPromise: Promise<void> | null = null;
@@ -552,6 +569,7 @@ async function ensureSeeded(): Promise<void> {
     await backfillUsersFromProfiles();
     await seedDatesForDemoProfiles();
     await seedMilestonesForDemoProfiles();
+    await seedEducationMonths();
   })().catch((err) => {
     bootstrapPromise = null;
     throw err;
@@ -564,6 +582,7 @@ async function ensureSeeded(): Promise<void> {
 export async function getProfiles(): Promise<Profile[]> {
   await ensureSeeded();
   await seedDatesForDemoProfiles();
+  await seedEducationMonths();
   const { rows } = await sql<Row>`SELECT * FROM profiles ORDER BY created_at DESC`;
   return rows.map(rowToProfile);
 }
@@ -577,6 +596,7 @@ export async function getProfile(id: string): Promise<Profile | undefined> {
 export async function getProfileByEmail(email: string): Promise<Profile | undefined> {
   await ensureSeeded();
   await seedDatesForDemoProfiles();
+  await seedEducationMonths();
   const { rows } = await sql<Row>`
     SELECT * FROM profiles WHERE lower(email) = ${email.toLowerCase()} ORDER BY created_at DESC LIMIT 1
   `;
